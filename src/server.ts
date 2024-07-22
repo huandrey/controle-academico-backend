@@ -24,9 +24,6 @@ app.get('/', (request: Request, response: Response) => {
   response.send('Hello World!')
 })
 
-type ErrorResponse = {
-  message: string;
-}
 app.get('/users/:id', async (request: Request, response: Response) => {
   try {
     const document = db.collection('users').doc(request.params.id);
