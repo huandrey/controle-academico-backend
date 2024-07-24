@@ -6,9 +6,9 @@ Essa API REST fornecerá consultas sobre notas, horários de aulas, situação d
 
 ## Requisitos Funcionais
 
-O usuário poderá fazer login na aplicação com suas credenciais do Sistema Acadêmico da sua universidade e que esteja integrado a esse servidor. Você pode conferir os Sistemas que essa API suporta (aqui)[https://algum-link-futuro.com.br].
+O usuário poderá fazer login na aplicação com suas credenciais do Sistema Acadêmico da sua universidade e que esteja integrado a esse servidor. Você pode conferir os Sistemas que essa API suporta [aqui](https://algum-link-futuro.com.br).
 
-O usuário poderá acessar suas informações básicas no aplicativo como nome, curso, matricula. Essas informações podem mudar com o tempo, a depender da necessidade vista. O objetivo aqui é prezar pela segurança dos dados. Para mais informações sobre a política de privacidade desse servidor, acesse (aqui)[https://algum-link-futuro.com.br]
+O usuário poderá acessar suas informações básicas no aplicativo como nome, curso, matricula. Essas informações podem mudar com o tempo, a depender da necessidade vista. O objetivo aqui é prezar pela segurança dos dados. Para mais informações sobre a política de privacidade desse servidor, acesse [aqui](https://algum-link-futuro.com.br)
 
 O usuário poderá acessar seu horário do período vigente. Podendo selecionar as disciplinas que ele deseja ser notificado quando houver aula no dia.
 
@@ -31,8 +31,8 @@ O aplicativo usa serviços de terceiros que podem coletar informações usadas p
 
 Link para a política de privacidade de provedores de serviços de terceiros usados pelo aplicativo
 
-(Google Play Services)[https://link-indisponivel.com.br]
+[Google Play Services](https://link-indisponivel.com.br)
 
-(Firebase Analytics)[https://firebase.google.com/products/analytics]
+[Firebase Analytics](https://firebase.google.com/products/analytics)
 
-(Crashlytics)[https://firebase.google.com/products/crashlytics]
+[Crashlytics](https://firebase.google.com/products/crashlytics)
