@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  name     String
+  role     Role
+  admin    Admin?   @relation("AdminToUser")
+  student  Student? @relation("StudentToUser")
+  teacher  Teacher? @relation("TeacherToUser")
+}
+
+model Admin {
+  id     Int  @id
+  user   User @relation("AdminToUser", fields: [id], references: [id])
+}
+
+model Student {
+  id          Int          @id @default(autoincrement())
+  user        User         @relation("StudentToUser", fields: [id], references: [id])
+  courseId    Int?
+  course      Course?      @relation(fields: [courseId], references: [id])
+  enrollments Enrollment[]
+  history     History[]    @relation("StudentToHistory")
+}
+
+model Teacher {
+  id         Int          @id @default(autoincrement())
+  user       User         @relation("TeacherToUser", fields: [id], references: [id])
+  courses    Course[]
+  disciplines Discipline[]
+}
+
+model Course {
+  id            Int            @id @default(autoincrement())
+  name          String
+  subjectCode   String
+  students      Student[]
+  disciplines   Discipline[]
+  teacherId     Int?
+  teacher       Teacher?       @relation(fields: [teacherId], references: [id])
+}
+
+model Discipline {
+  id          Int             @id @default(autoincrement())
+  nome        String
+  creditos    Int
+  semestre    String
+  quantidadeProvas    Int
+  quantidadeFaltas    Int
+  mediaFinal  Decimal?
+  teacherId   Int?
+  teacher     Teacher?        @relation(fields: [teacherId], references: [id])
+  status      DisciplineStatus
+  courseId    Int?
+  course      Course?          @relation(fields: [courseId], references: [id])
+  enrollments Enrollment[]
+  history     History?        @relation(fields: [historyId], references: [id])
+  historyId   Int?
+  details     String?
+}
+
+model Enrollment {
+  id            Int            @id @default(autoincrement())
+  studentId     Int
+  disciplineId  Int
+  student       Student        @relation(fields: [studentId], references: [id])
+  discipline    Discipline     @relation(fields: [disciplineId], references: [id])
+  grade         Float?         // Adicionado para registrar a nota do aluno na disciplina
+  status        EnrollmentStatus // Status de aprovação na disciplina
+}
+
+model History {
+  id         Int          @id @default(autoincrement())
+  studentId  Int
+  student    Student      @relation("StudentToHistory", fields: [studentId], references: [id])
+  disciplines Discipline[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+  TEACHER
+}
+
+
+enum DisciplineStatus {
+  APENAS_MEDIA_APROVADO
+  APENAS_MEDIA_REPROVADO
+  REPROVADO_POR_FALTA
+  TRANCADA
+  EM_PROGRESSO
+  PAID
+  IN_PROGRESS
+  FAILED 
+}
+
+enum EnrollmentStatus {
+  PASSED
+  FAILED
+  WITHDRAWN
+}
