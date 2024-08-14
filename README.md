@@ -36,3 +36,5 @@ Link para a política de privacidade de provedores de serviços de terceiros usa
 [Firebase Analytics](https://firebase.google.com/products/analytics)
 
 [Crashlytics](https://firebase.google.com/products/crashlytics)
+
+[Documentation - SWAGGER](https://app.swaggerhub.com/apis/HUANDREYPONTES_1/ControlaAcademico/1.0.0)

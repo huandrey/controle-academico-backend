@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+ db:
+   image: postgres
+   container_name: banco-de-dados-postgress
+   restart: always
+   volumes:
+    - pgdata:/var/lib/postgresql/data
+   environment:
+     POSTGRES_PASSWORD: sua-senha
+   ports:
+     - 5432:5432
+   logging:
+     driver: json-file
+     options:
+       max-size: 100m
+volumes:
+ pgdata:
+
