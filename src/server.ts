@@ -1,16 +1,16 @@
-import express, { Request, Response } from 'express';
-import path from 'path';
+import express, { Request, Response } from 'express'
+import path from 'path'
 import cors from 'cors'
-import { PrismaClient } from '@prisma/client';
-import { userRoutes } from './routes/user-route';
+import { PrismaClient } from '@prisma/client'
+import { userRoutes } from './routes/user-route'
 
 const prisma = new PrismaClient()
 
 const app = express()
 const port = 3000
 
-app.use(cors({ origin: true }));
-app.use(express.json());
+app.use(cors({ origin: true }))
+app.use(express.json())
 app.use(express.static(path.join(__dirname, 'public')))
 
 async function main() {}
@@ -25,7 +25,7 @@ main()
     process.exit(1)
   })
 
-app.use('/api/users', userRoutes);
+app.use('/api/users', userRoutes)
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Bem-vindo a API do Controle Acadêmico!')
