@@ -1,16 +1,21 @@
-import { PrismaClient } from '@prisma/client'
-import { DiscenteRepository, IDiscenteRepository } from '../repositories/discente-repository'
+import {  IDiscenteRepository } from '../repositories/discente-repository'
 import { DiscenteDTO } from '../dtos/discente-dto'
-import { PrismaDatabase } from '../database/prisma-database'
+import { Discente } from '@prisma/client'
 
-export class DiscenteService {
+export interface IDiscenteService {
+  lidaComCriacaoDoDiscente(data: DiscenteDTO): Promise<Discente | null>
+  lidaComAtualizacaoDoDiscente(id: number, data: Partial<DiscenteDTO>): Promise<Discente | null>
+  lidaComRemocaoDoDiscente(id: number): Promise<void>
+  lidaComBuscaDoDiscentePorId(id: number): Promise<Discente | null>
+}
+export class DiscenteService implements IDiscenteService {
   private discenteRepository: IDiscenteRepository
 
-  constructor() {
-    this.discenteRepository = new DiscenteRepository(new PrismaDatabase())
+  constructor(discenteRepository: IDiscenteRepository) {
+    this.discenteRepository = discenteRepository
   }
 
-  async lidaComCriacaoDoUsuario(data: DiscenteDTO) {
+  async lidaComCriacaoDoDiscente(data: DiscenteDTO) {
     try {
       const discente = await this.discenteRepository.criaDiscente(data)
       return discente
@@ -30,7 +35,7 @@ export class DiscenteService {
       throw new Error('Error fetching discente')
     }
   }
-  async lidaComAtualizacaoDoUsuario(id: number, data: Partial<DiscenteDTO>) {
+  async lidaComAtualizacaoDoDiscente(id: number, data: Partial<DiscenteDTO>) {
     try {
       const discenteAtualizado = await this.discenteRepository.atualizaDiscente(id, data)
       return discenteAtualizado

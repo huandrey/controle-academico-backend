@@ -12,6 +12,7 @@ const userService = new UserService(userRepository)
 const userController = new UserController(userService)
 
 router.post('create', userController.criaUsuario.bind(userController))
-// router.post('/import', userController.importUserData.bind(userController))
+router.post('update', userController.atualizaUsuario.bind(userController))
+router.delete('delete', userController.deletaUsuario.bind(userController));
 
 export { router as userRoutes }

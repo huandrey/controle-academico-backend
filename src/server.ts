@@ -3,6 +3,8 @@ import path from 'path'
 import cors from 'cors'
 import { PrismaClient } from '@prisma/client'
 import { userRoutes } from './routes/user-route'
+import { disciplinaRoutes } from './routes/disciplina-route'
+import { discenteRoutes } from './routes/discente-route'
 
 const prisma = new PrismaClient()
 
@@ -26,6 +28,8 @@ main()
   })
 
 app.use('/api/users', userRoutes)
+app.use('/api/discentes', discenteRoutes)
+app.use('/api/disciplinas', disciplinaRoutes)
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Bem-vindo a API do Controle Acadêmico!')

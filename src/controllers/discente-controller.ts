@@ -1,20 +1,19 @@
 import { Request, Response } from 'express'
-import { StudentDTO } from '../dtos/student-dto'
-import { DiscenteService } from '../services/discente-service'
 import { DiscenteDTO } from '../dtos/discente-dto'
+import { IDiscenteService } from '../services/discente-service'
 
 export class DiscenteController {
-  private discenteService: DiscenteService
+  private discenteService: IDiscenteService
 
-  constructor() {
-    this.discenteService = new DiscenteService()
+  constructor(discenteService: IDiscenteService) {
+    this.discenteService = discenteService
   }
 
   public async criaDiscente(req: Request, res: Response): Promise<void> {
     const discente: DiscenteDTO = req.body
 
     try {
-      await this.discenteService.lidaComCriacaoDoUsuario(discente)
+      await this.discenteService.lidaComCriacaoDoDiscente(discente)
       res.status(201).json({ message: "Aluno criado com sucesso!" })
     } catch (error) {
       if (error instanceof ErroEncontradoNaCamadaDeServico) {
@@ -48,10 +47,10 @@ export class DiscenteController {
 
   public async atualizaDiscente(req: Request, res: Response): Promise<void> {
     const discenteId = parseInt(req.params.id, 10)
-    const discente: StudentDTO = req.body
+    const discente: DiscenteDTO = req.body
 
     try {
-      const updatedStudent = await this.discenteService.lidaComAtualizacaoDoUsuario(discenteId, discente)
+      const updatedStudent = await this.discenteService.lidaComAtualizacaoDoDiscente(discenteId, discente)
       if (updatedStudent) {
         res.status(200).json(updatedStudent)
       } else {
@@ -67,7 +66,7 @@ export class DiscenteController {
     }
   }
 
-  public async deleteStudent(req: Request, res: Response): Promise<void> {
+  public async deletaDiscente(req: Request, res: Response): Promise<void> {
     const discenteId = parseInt(req.params.id, 10)
 
     try {
