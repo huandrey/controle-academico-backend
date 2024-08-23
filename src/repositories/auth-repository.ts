@@ -1,43 +1,24 @@
-export interface IAuthRepository {
-  validateUserCredentials(email: string, password: string): Promise<User | null>
-  generateToken(user: User): Promise<string>
-  verifyToken(token: string): Promise<User | null>
-}
+import { IDatabase } from "../database/database-interface"
 
-export type User = {
-  id: string
-  email: string
-  name: string
-  password: string
-  role: string
-  createdAt: Date
-  updatedAt: Date
+export interface IAuthRepository {
+  adicionaTokenDeAutenticacao(id: number, token: string): Promise<void>
 }
 
 export class AuthRepository implements IAuthRepository {
-  private orm: any
-  private jwtService: any
+  private orm: IDatabase
 
-  constructor(orm: any, jwtService: any) {
+  constructor(orm: IDatabase) {
     this.orm = orm
-    this.jwtService = jwtService
   }
 
-  async validateUserCredentials(email: string, password: string): Promise<User | null> {
-    const user = await this.orm.user.findUnique({ where: { email } })
-    if (user && user.password === password) {  // Adicione hash/salt em produçãoreturn user
-    }
-    return null
-  }
+  // async validateUserCredentials(email: string, password: string): Promise<Use | null> {
+  //   const user = await this.orm.user.findUnique({ where: { email } })
+  //   if (user && user.password === password) {  // Adicione hash/salt em produçãoreturn user
+  //   }
+  //   return null
+  // }
 
-  async generateToken(user: User): Promise<string> {
-    return this.jwtService.sign({ userId: user.id, email: user.email, role: user.role })
-  }
-
-  async verifyToken(token: string): Promise<User | null> {
-    const decoded = this.jwtService.verify(token)
-    if (!decoded) return null
-
-    return this.orm.user.findUnique({ where: { id: decoded.userId } })
+  async adicionaTokenDeAutenticacao(userId: number, token: string): Promise<void> {
+    await this.orm.adicionaTokenDeAutenticacao(userId, token)
   }
 }

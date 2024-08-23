@@ -14,13 +14,13 @@ export class DisciplinaService implements IDisciplinaService {
   }
 
     async importUserData(login: string, senha: string, vinculo: string): Promise<Disciplina[]> {
-    const importer = this.switchImporter(vinculo)
-    const disciplinasImportadas = await importer.importDisciplinas(login, senha, vinculo)
-    console.log(`importUserData: ${disciplinasImportadas}`)
+      const importer = this.switchImporter(vinculo)
+      const disciplinasImportadas = await importer.importDisciplinas(login, senha, vinculo)
+      console.log(`importUserData: ${disciplinasImportadas}`)
 
-    const disciplinas = await this.disciplinaRepository.saveDisciplinas(disciplinasImportadas)
+      const disciplinas = await this.disciplinaRepository.saveDisciplinas(disciplinasImportadas)
 
-    return disciplinas
+      return disciplinas
   }
 
   switchImporter(vinculo: string) {

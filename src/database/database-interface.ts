@@ -8,6 +8,7 @@ export interface IDatabase {
   buscaUsuarioPorEmail(email: string): Promise<User | null>
   atualizaUsuario(id: number, data: Partial<UserDTO>): Promise<User>
   deletaUsuario(id: number): Promise<void>
+  buscaPorUsuarios(): Promise<User[] | null>
 
   criaDiscente(data: StudentDTO): Promise<Discente>
   atualizaDiscente(id: number, data: Partial<StudentDTO>): Promise<Discente>
@@ -17,5 +18,5 @@ export interface IDatabase {
   buscaDiscentePorEmail(email: string): Promise<Discente>
 
   autenticaUsuario(email: string, senha: string): Promise<User | null>
-  validaToken(token: string): Promise<boolean>
+  adicionaTokenDeAutenticacao(id: number, token: string): Promise<void>
 }

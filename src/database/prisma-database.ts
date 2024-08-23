@@ -8,6 +8,20 @@ import { DiscenteDTO } from '../dtos/discente-dto'
 const prisma = new PrismaClient()
 
 export class PrismaDatabase implements IDatabase {
+  async buscaPorUsuarios(): Promise<User[] | null> {
+    return await prisma.user.findMany()
+  }
+  
+  async adicionaTokenDeAutenticacao(id: number, token: string): Promise<void> {
+    await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        token
+      }
+    })
+  }
   buscaUsuarioPorEmail(email: string): Promise<User | null> {
     throw new Error('Method not implemented.')
   }
@@ -27,6 +41,7 @@ export class PrismaDatabase implements IDatabase {
     throw new Error('Method not implemented.')
   }
   criaDiscente(data: DiscenteDTO): Promise<Discente> {
+    console.log(data)
     const discente = prisma.discente.create({ 
       data: {
         nome: data.nome,

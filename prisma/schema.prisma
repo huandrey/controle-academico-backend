@@ -38,6 +38,7 @@ model Universidade {
 model User {
   id        Int      @id @default(autoincrement())
   nome      String
+  token     String?  
   role      Role     @default(DISCENTE)
   createdAt DateTime @default(now())
   discente  Discente?
@@ -47,7 +48,7 @@ model User {
 model Discente {
   id          Int      @id @default(autoincrement())
   nome        String
-  matricula   String   @unique @db.VarChar(6) 
+  matricula   String   @unique @db.VarChar(9) 
   cursoId     Int
   userId      Int      @unique
   livroId     Int?     @unique

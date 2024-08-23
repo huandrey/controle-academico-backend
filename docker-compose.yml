@@ -3,12 +3,12 @@ version: '3'
 services:
  db:
    image: postgres
-   container_name: banco-de-dados-postgress
+   container_name: controle-academico-postgress
    restart: always
    volumes:
     - pgdata:/var/lib/postgresql/data
    environment:
-     POSTGRES_PASSWORD: sua-senha
+     POSTGRES_PASSWORD: controle
    ports:
      - 5432:5432
    logging:

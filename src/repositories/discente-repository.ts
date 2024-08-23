@@ -8,6 +8,7 @@ export interface IDiscenteRepository {
   deletaDiscente(id: number): Promise<void>
   buscaDiscentePorId(id: number): Promise<Discente | null>
   buscaDiscentePorEmail(email: string): Promise<Discente | null>
+  buscaDiscentePorMatricula(matricula: string): Promise<Discente | null>
 }
 
 export type AtualizaDiscenteDTO = {

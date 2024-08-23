@@ -32,6 +32,8 @@ export class DisciplinaController {
   public async deletaDisciplina(req: Request, res: Response): Promise<void> {
 
   }
+
+  public async importaDisciplinas(req: Request, res: Response): Promise<void> {}
 }
 
 //   toString() {
