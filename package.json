@@ -15,11 +15,12 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.18.0",
-    "axios": "^1.7.2",
+    "axios": "^1.7.5",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "he": "^1.2.0",
+    "iconv-lite": "^0.6.3",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {

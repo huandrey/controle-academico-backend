@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { IDiscenteService } from "../services/discente-service";
+import { DiscenteService, IDiscenteService } from "../services/discente-service";
 import jwt from 'jsonwebtoken'
 import { ReportarErrorAoSistema } from "../exceptions/ReportarErroAoSistema";
 
@@ -16,10 +16,13 @@ export interface PayloadUserAlreadyExists extends Partial<PayloadToken>  {
 
 export class AutorizacaoMiddleware {
   private segredo: string;
-  private discenteService?: IDiscenteService
-  constructor(discenteService?: IDiscenteService) {
+  private discenteService?: DiscenteService
+
+  constructor(discenteService?: DiscenteService) {
     this.segredo = process.env.JWT_SECRET || 'segredo_padrao'
     this.discenteService = discenteService
+
+    console.log(discenteService)
   }
 
   public autorizarApenas(roleNecessaria: string) {
@@ -63,11 +66,11 @@ export class AutorizacaoMiddleware {
     const { matricula } = req.body;
     
     if (!this.discenteService) {
-      return res.status(500).json({ message: 'DiscenteService is undefined. Por favor, verifique se a propriedade foi inicializada corretamente.' });
+      throw new ReportarErrorAoSistema("DiscenteService is undefined. Por favor, verifique se a propriedade foi inicializada corretamente.")
     }
 
     try {
-      const aluno = await this.discenteService?.lidaComBuscaDoDiscentePorMatricula(matricula);
+      const aluno = await this.discenteService.lidaComBuscaDoDiscentePorMatricula(matricula);
 
       interface CustomRequest extends Request {
         user: PayloadUserAlreadyExists;

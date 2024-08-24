@@ -1,4 +1,4 @@
-export type StudentDTO = {
+export type DiscenteDTO = {
   nome: string
   matricula: string
 }

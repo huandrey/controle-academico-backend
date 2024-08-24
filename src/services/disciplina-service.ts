@@ -1,9 +1,11 @@
 import { Disciplina } from "@prisma/client"
 import { IDisciplinaRepository } from "../repositories/disciplina-repository"
 import { UFCGImporter } from "../importers/implementation/ufcg-importer"
+import { Importer } from "../importers/importer"
+import { SessionDTO } from "../dtos/session-dto"
 
 export interface IDisciplinaService {
-  importUserData(login: string, senha: string, vinculo: string): Promise<Disciplina[]>
+  lidaComImportacaoDasDisciplinasDoDiscente(sessionDTO: SessionDTO, importer: Importer): Promise<number>
 }
 
 export class DisciplinaService implements IDisciplinaService {
@@ -13,14 +15,19 @@ export class DisciplinaService implements IDisciplinaService {
     this.disciplinaRepository = disciplinaRepository
   }
 
-    async importUserData(login: string, senha: string, vinculo: string): Promise<Disciplina[]> {
-      const importer = this.switchImporter(vinculo)
-      const disciplinasImportadas = await importer.importDisciplinas(login, senha, vinculo)
-      console.log(`importUserData: ${disciplinasImportadas}`)
+    async lidaComImportacaoDasDisciplinasDoDiscente(sessionDTO: SessionDTO, importer: Importer): Promise<number> {
+      if (!sessionDTO.matricula || !sessionDTO.senha) {
+        throw new Error("Login, senha são obrigatórios")
+      }
 
-      const disciplinas = await this.disciplinaRepository.saveDisciplinas(disciplinasImportadas)
+      const { matricula, senha, discenteId } = sessionDTO
 
-      return disciplinas
+      const disciplinasImportadas = await importer.importaDisciplinas(discenteId!, matricula, senha)
+      console.log(`importUserData: ${JSON.stringify(disciplinasImportadas, null, 2)}`)
+
+      const countDisciplinasCriadas = await this.disciplinaRepository.saveDisciplinas(disciplinasImportadas)
+
+      return countDisciplinasCriadas
   }
 
   switchImporter(vinculo: string) {

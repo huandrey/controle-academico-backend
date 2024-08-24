@@ -4,7 +4,7 @@ import { User } from '@prisma/client'
 import { ReportarErrorAoSistema } from '../exceptions/ReportarErroAoSistema'
 
 export interface IUserService {
-  lidaComCriacaoDoUsuario(data: UserDTO): Promise<User>
+  lidaComCriacaoDoUsuario(data: UserDTO): Promise<User | null>
   lidaComBuscaDoUsuarioPorId(id: number): Promise<User | null>
   lidaComAtualizacaoDoUsuario(id: number, data: Partial<UserDTO>): Promise<User | null>
   lidaComRemocaoDoUsuario(id: number): Promise<void>
@@ -17,7 +17,7 @@ export class UserService implements IUserService {
     this.userRepository = userRepository
   }
 
-  async lidaComCriacaoDoUsuario({ nome, role }: UserDTO) {
+  async lidaComCriacaoDoUsuario({ nome, role }: UserDTO): Promise<User | null> {
     try {
       if (!nome || typeof nome !== 'string') {
         throw new ReportarErrorAoSistema('Nome é obrigatório e precisa ser uma string.')

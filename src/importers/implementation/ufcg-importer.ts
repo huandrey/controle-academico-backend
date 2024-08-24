@@ -1,27 +1,11 @@
 import axios from 'axios'
 import * as cheerio from 'cheerio' // Importação correta
 import he from 'he'
+import { Importer } from '../importer'
+import { Disciplina, DisciplinaStatus } from '@prisma/client'
+import iconv from 'iconv-lite';
 
-export interface Disciplina {
-  nome: string
-  creditos: number
-  quantidadeProvas: number
-  quantidadeFaltas: number
-  semestre: string
-  mediaFinal: number | null
-  status: string
-  details?: string
-}
-
-enum DisciplinaStatus {
-  APENAS_MEDIA_APROVADO = "APENAS_MEDIA_APROVADO",
-  APENAS_MEDIA_REPROVADO = "APENAS_MEDIA_REPROVADO",
-  REPROVADO_POR_FALTA = "REPROVADO_POR_FALTA",
-  TRANCADA = "TRANCADA",
-  EM_PROGRESSO = "EM_PROGRESSO"
-}
-
-export class UFCGImporter {
+export class UFCGImporter implements Importer {
   private URL_BASE = "https://pre.ufcg.edu.br:8443/ControleAcademicoOnline/Controlador"
   private URL_LOGIN = this.URL_BASE
   private LOGIN = "login"
@@ -37,7 +21,7 @@ export class UFCGImporter {
   private ERRO_AUTENTICACAO = "ERRO NA AUTENTICAÇÃO"
   public static readonly ERRO = "Matrícula inválida ou senha incorreta."
 
-  private reportProgress(message: string): void {
+  reportProgress(message: string): void {
     console.log(message) // Implement your progress reporting logic here
   }
 
@@ -47,33 +31,41 @@ export class UFCGImporter {
     .trim() // Remove espaços em branco no início e no final
   }
   
-  public async importDisciplinas(login: string, senha: string, vinculo: string): Promise<Disciplina[]> {
-    const disciplinas: Disciplina[] = []
+  public async importaDisciplinas(discenteId: number, matricula: string, senha: string): Promise<Disciplina[]> {
+    const disciplinas: any = []
     const codigos: string[] = []
     this.reportProgress("Tentando fazer login...")
 
     try {
       // Se autentica e armazena o cookie
       const response = await axios.post(this.URL_LOGIN, new URLSearchParams({
-        [this.LOGIN]: login,
+        [this.LOGIN]: matricula,
         [this.SENHA]: senha,
         [this.COMMAND]: this.ALUNO_LOGIN
       }), {
         timeout: 10000,
         withCredentials: true,
         validateStatus: () => true,
-        responseType: 'text', 
         httpsAgent: new (require('https').Agent)({
           rejectUnauthorized: false
-        })
+        }),
+        responseType: 'arraybuffer', // Receber os dados como array buffer
+        responseEncoding: 'binary',
       })
-
+      
       const cookies: string[] = response.headers['set-cookie']!
-      const $ = cheerio.load(response.data) // Carregando o HTML
+      let html = iconv.decode(Buffer.from(response.data), 'ISO-8859-1');
+
+      // Substituir <meta charset="ISO-8859-1"> por <meta charset="UTF-8">
+      html = html.replace(/<meta[^>]*charset=["']?[^"'>]+["']?[^>]*>/i, '<meta charset="UTF-8">');
+
+      const $ = cheerio.load(html) // Carregando o HTML
 
       if ($('head').text().includes(this.ERRO_AUTENTICACAO) || $('body').text().includes(UFCGImporter.ERRO)) {
         throw new Error("Authentication Failed")
       }
+
+      console.log(response.data)
 
       // Abre a página do Histórico e pega o texto das disciplinas
       this.reportProgress("Obtendo histórico...")
@@ -83,22 +75,31 @@ export class UFCGImporter {
         timeout: 10000,
         httpsAgent: new (require('https').Agent)({
           rejectUnauthorized: false
-        })
+        }),
+        responseType: 'arraybuffer', // Receber os dados como array buffer
+        responseEncoding: 'binary',
       })
 
-      const historico$ = cheerio.load(historicoResponse.data)
+      let htmlHistoricoResponse = iconv.decode(Buffer.from(historicoResponse.data), 'ISO-8859-1');
+      htmlHistoricoResponse = htmlHistoricoResponse.replace(/<meta[^>]*charset=["']?[^"'>]+["']?[^>]*>/i, '<meta charset="UTF-8">');
+      console.log(htmlHistoricoResponse)
+      const historico$ = cheerio.load(htmlHistoricoResponse)
+      
       const trsDisciplinas: any = historico$("div[id=disciplinas] > table > tbody > tr").toArray()
 
       for (const el of trsDisciplinas) {
         const tds = historico$(el).find("td")
-        const disciplina: Disciplina = {
+        const disciplina = {
+          codigo: tds.eq(0).text() || '',
           nome: this.cleanText(tds.eq(1).text()) || '',
           creditos: parseInt(tds.eq(3).text() || '0', 10),
           quantidadeProvas: this.calcularQtdeNotas(parseInt(tds.eq(3).text() || '0', 10)),
           quantidadeFaltas: this.calcularQtdeFaltas(parseInt(tds.eq(3).text() || '0', 10)),
           semestre: tds.eq(7).text() || '',
           mediaFinal: isNaN(parseFloat(tds.eq(5).text().replace(",", "."))) ? null : parseFloat(tds.eq(5).text().replace(",", ".")),
-          status: ''
+          status: '',
+          cursoId: 1,
+          discenteId,
         }
 
         switch (tds.eq(6).text()) {
@@ -137,10 +138,15 @@ export class UFCGImporter {
         headers: { Cookie: cookies.join(' ') },
         httpsAgent: new (require('https').Agent)({
           rejectUnauthorized: false
-        })
+        }),
+        responseType: 'arraybuffer', // Receber os dados como array buffer
+        responseEncoding: 'binary',
       })
 
-      const horario$ = cheerio.load(horarioResponse.data)
+      let htmlHorarioResponse = iconv.decode(Buffer.from(horarioResponse.data), 'ISO-8859-1');
+      htmlHorarioResponse = htmlHorarioResponse.replace(/<meta[^>]*charset=["']?[^"'>]+["']?[^>]*>/i, '<meta charset="UTF-8">');
+      
+      const horario$ = cheerio.load(htmlHorarioResponse)
       const table = horario$("table")
 
       if (table) {
@@ -152,7 +158,7 @@ export class UFCGImporter {
           const disciplina = this.findDisciplina(disciplinas, codigos, tds.eq(1).text() || '')
 
           if (disciplina) {
-            disciplina.details = `Turma: ${tds.eq(3).text()}\nHorário: ${tds.eq(4).text()}`
+            disciplina.horario = `Turma: ${tds.eq(3).text()}\nHorário: ${tds.eq(4).text()}`
           }
         })
       }

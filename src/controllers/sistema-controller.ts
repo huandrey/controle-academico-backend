@@ -1,18 +1,22 @@
 import { Request, Response } from "express";
-import { DiscenteController } from "./discente-controller";
-import { DisciplinaController } from "./disciplina-controller";
-import { UserController } from "./user-controller";
 import { PayloadUserAlreadyExists } from "../middlewares/autorizacao-middleware";
+import { UserService } from "../services/user-service";
+import { DiscenteService } from "../services/discente-service";
+import { DisciplinaService } from "../services/disciplina-service";
+import { SessionDTO } from "../dtos/session-dto";
+import { SistemaService } from "../services/sistema-service";
 
 export class SistemaController {
-  private userController: UserController
-  private discenteController: DiscenteController
-  private disciplinaController: DisciplinaController
+  private userService: UserService
+  private discenteService: DiscenteService
+  private disciplinaService: DisciplinaService
+  private sistemaService: SistemaService
 
-  constructor(userController: UserController, discenteController: DiscenteController, disciplinaController: DisciplinaController) {
-    this.userController = userController,
-    this.discenteController = discenteController
-    this.disciplinaController = disciplinaController
+  constructor(userService: UserService, discenteService: DiscenteService, disciplinaService: DisciplinaService, sistemaService: SistemaService) {
+    this.userService = userService,
+    this.discenteService = discenteService
+    this.disciplinaService = disciplinaService
+    this.sistemaService = sistemaService
   }
 
   public async criaConexaoComSistema(req: Request, res: Response): Promise<void> {
@@ -20,20 +24,21 @@ export class SistemaController {
       user: PayloadUserAlreadyExists;
     }
 
-    // customReq agora compartilha o mesmo acesso de memória que req 
-    const customReq: CustomRequest = req as CustomRequest;
+    const sessionDTO: SessionDTO = req.body;
 
-    const { userAlreadyExists  } = customReq.user;
+    // // customReq agora compartilha o mesmo acesso de memória que req 
+    // const customReq: CustomRequest = req as CustomRequest;
 
-    if (userAlreadyExists) {
-      this.retornaDadosDoDiscente()
-    }
+    // const { userAlreadyExists  } = customReq.user;
 
-    this.configuraSistemaDoUsuario()
+    // if (userAlreadyExists) {
+    //   this.retornaDadosDoDiscente()
+    // }
 
-    // Implementar a criação do sistema
+    this.configuraSistemaDoUsuario(sessionDTO)
 
-    // Implementar a criação do sistema
+
+    res.status(200).json({ message: 'Conexão com o sistema criada com sucesso!' })
   }
 
   public atualizaSistema(): void {
@@ -44,12 +49,32 @@ export class SistemaController {
     // Implementar a consulta dos dados do discente
   }
 
-  private configuraSistemaDoUsuario() {
-    // Implementar a configuração do sistema do usuário
-
-    // Importa disciplinas do usuário
-
+  // Implementar a configuração do sistema do usuário
+  private async configuraSistemaDoUsuario(sessionDTO: SessionDTO) {
     // Importa dados do usuário
+    // Cria usuário
+    const usuario = await this.userService.lidaComCriacaoDoUsuario({ nome: '', role: 'DISCENTE' })
+   
+    if (!usuario) {
+      throw new Error('Erro ao cadastrar o usuário')
+    }
+
+    const discente = await this.discenteService.lidaComCriacaoDoDiscente({
+      nome: '',
+      matricula: sessionDTO.matricula,
+      cursoId: 1, // Adicionar o ID do curso
+      userId: usuario!.id, // Adicionar o ID do usuário
+    });
+
+    if (!discente) {
+      throw new Error('Erro ao cadastrar o discente')
+    }
+
+    // Identifica a instituição que o aluno possui vínculo
+    const importer = this.sistemaService.lidaComIdentificacaoDaInstituicaoDeEnsino(sessionDTO.vinculo)
+
+     // Importa disciplinas do usuário
+    this.disciplinaService.lidaComImportacaoDasDisciplinasDoDiscente({ ...sessionDTO, discenteId: discente.id }, importer)
 
     // Configura as permissões do usuário
 
@@ -63,4 +88,5 @@ export class SistemaController {
 
     // Inicia a API
   }
+
 }

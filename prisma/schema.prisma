@@ -18,6 +18,7 @@ enum DisciplinaStatus {
   APENAS_MEDIA_REPROVADO     // A disciplina foi registrada como nota insuficiente e reprovado no sistema
   REPROVADO_POR_FALTA        // A disciplina foi registrada como aluno reprovado por falta
   TRANCADA                   // A disciplina foi registrada como trancada pelo aluno
+  EM_PROGRESSO
 }
 
 enum DisciplinaEmCursoStatus {
@@ -58,6 +59,7 @@ model Discente {
   livros      LivroEmprestadoBiblioteca? @relation(fields: [livroId], references: [id])
   disciplinasEmCurso  DisciplinaEmCurso[]
   historicos  HistoricoAlunoDisciplina[]
+  Disciplina Disciplina[]
 }
 
 model LivroEmprestadoBiblioteca {
@@ -99,20 +101,24 @@ model Curso {
 
 model Disciplina {
   id            Int           @id @default(autoincrement())
+  codigo        String?        
   nome          String
   creditos      Int           // Créditos são definidos por horas. Ex: "Cáculo I possui 4 horas semanais, portanto 4 créditos."
-  semestre      Int           // Semestre em que a disciplina foi cursada
+  semestre      String        // Semestre em que a disciplina foi cursada
   quantidadeProvas Int
   quantidadeFaltas Int
   mediaFinal    Float?
   docenteId     Int?
+  discenteId    Int?
   status        DisciplinaStatus
   cursoId       Int
   createdAt     DateTime       @default(now())
   docente       Docente?       @relation(fields: [docenteId], references: [id])
+  discente      Discente?       @relation(fields: [discenteId], references: [id])
   curso         Curso          @relation(fields: [cursoId], references: [id])
   historicos    HistoricoAlunoDisciplina[]
   disciplinasEmCurso DisciplinaEmCurso[]
+  horario       String?
 }
 
 model HistoricoAlunoDisciplina {
