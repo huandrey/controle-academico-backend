@@ -14,7 +14,7 @@ const discenteController = new DiscenteController(discenteService)
 const middlewareAutorizacao = new AutorizacaoMiddleware()
 
 router.post('/create', middlewareAutorizacao.autorizarApenas('ADMIN'), discenteController.criaDiscente.bind(discenteController))
-router.post('/update', middlewareAutorizacao.autorizarApenas('ADMIN'), discenteController.atualizaDiscente.bind(discenteController))
-router.delete('/delete', middlewareAutorizacao.autorizarApenas('ADMIN'), discenteController.deletaDiscente.bind(discenteController));
+router.post('/update/:id', middlewareAutorizacao.autorizarApenas('ADMIN'), discenteController.atualizaDiscente.bind(discenteController))
+router.delete('/delete/:id', middlewareAutorizacao.autorizarApenas('ADMIN'), discenteController.deletaDiscente.bind(discenteController));
 
 export { router as discenteRoutes }

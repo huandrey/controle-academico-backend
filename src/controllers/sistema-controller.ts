@@ -5,6 +5,7 @@ import { DiscenteService } from "../services/discente-service";
 import { DisciplinaService } from "../services/disciplina-service";
 import { SessionDTO } from "../dtos/session-dto";
 import { SistemaService } from "../services/sistema-service";
+import { ReportarErrorAoSistema } from "../exceptions/ReportarErroAoSistema";
 
 export class SistemaController {
   private userService: UserService
@@ -24,9 +25,7 @@ export class SistemaController {
       user: PayloadUserAlreadyExists;
     }
 
-    const sessionDTO: SessionDTO = req.body;
-
-    // // customReq agora compartilha o mesmo acesso de memória que req 
+    // customReq agora compartilha o mesmo acesso de memória que req 
     // const customReq: CustomRequest = req as CustomRequest;
 
     // const { userAlreadyExists  } = customReq.user;
@@ -35,10 +34,19 @@ export class SistemaController {
     //   this.retornaDadosDoDiscente()
     // }
 
-    this.configuraSistemaDoUsuario(sessionDTO)
-
-
-    res.status(200).json({ message: 'Conexão com o sistema criada com sucesso!' })
+    const sessionDTO: SessionDTO = req.body;
+    try {
+      this.configuraSistemaDoUsuario(sessionDTO)
+      res.status(200).json({ message: 'Conexão com o sistema criada com sucesso!' })
+    } catch (error) {
+      console.log('erro sistema')
+      console.log(error)
+      if (error instanceof ReportarErrorAoSistema) {
+        res.status(400).send({
+          message: error.message
+        })
+      }
+    }
   }
 
   public atualizaSistema(): void {
@@ -51,7 +59,9 @@ export class SistemaController {
 
   // Implementar a configuração do sistema do usuário
   private async configuraSistemaDoUsuario(sessionDTO: SessionDTO) {
-    // Importa dados do usuário
+   try {
+    const importer = this.sistemaService.lidaComIdentificacaoDaInstituicaoDeEnsino(sessionDTO.vinculo)
+    const dadosDiscente = importer.autenticaUsuario(sessionDTO.matricula, sessionDTO.senha)
     // Cria usuário
     const usuario = await this.userService.lidaComCriacaoDoUsuario({ nome: '', role: 'DISCENTE' })
    
@@ -71,22 +81,12 @@ export class SistemaController {
     }
 
     // Identifica a instituição que o aluno possui vínculo
-    const importer = this.sistemaService.lidaComIdentificacaoDaInstituicaoDeEnsino(sessionDTO.vinculo)
 
-     // Importa disciplinas do usuário
+     // Importa e salva disciplinas do usuário
     this.disciplinaService.lidaComImportacaoDasDisciplinasDoDiscente({ ...sessionDTO, discenteId: discente.id }, importer)
-
-    // Configura as permissões do usuário
-
-    // Cria as rotas do sistema
-
-    // Cria as rotas do sistema do usuário
-
-    // Inicia as rotas do sistema
-
-    // Inicia as rotas do sistema do usuário
-
-    // Inicia a API
+   } catch (error) {
+    throw error
+   }
   }
 
 }

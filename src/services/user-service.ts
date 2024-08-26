@@ -29,7 +29,7 @@ export class UserService implements IUserService {
       const user = await this.userRepository.criaUsuario({ nome, role })
       return user
     } catch (error) {
-      throw new ReportarErrorAoSistema('Erro ao tentar salvar usuário ao banco de dados.')
+      throw error
     }
   }
 

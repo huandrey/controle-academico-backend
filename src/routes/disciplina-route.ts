@@ -14,7 +14,7 @@ const disciplinaController = new DisciplinaController(disciplinaService)
 const middlewareAutorizacao = new AutorizacaoMiddleware()
 
 router.post('/create', middlewareAutorizacao.autorizarApenas('ADMIN'), disciplinaController.criaDisciplina.bind(disciplinaController))
-router.post('/update', middlewareAutorizacao.autorizarApenas('ADMIN'), disciplinaController.atualizaDisciplina.bind(disciplinaController))
-router.delete('/delete', middlewareAutorizacao.autorizarApenas('ADMIN'), disciplinaController.deletaDisciplina.bind(disciplinaController));
+router.post('/update/:id', middlewareAutorizacao.autorizarApenas('ADMIN'), disciplinaController.atualizaDisciplina.bind(disciplinaController))
+router.delete('/delete/:id', middlewareAutorizacao.autorizarApenas('ADMIN'), disciplinaController.deletaDisciplina.bind(disciplinaController));
 
 export { router as disciplinaRoutes }
