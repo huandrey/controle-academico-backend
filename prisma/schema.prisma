@@ -96,61 +96,47 @@ model Curso {
 
 model Disciplina {
   id            Int           @id @default(autoincrement())
-
   cursoId       Int
-
   codigo        String?        
   nome          String
   creditos      Int           // Créditos são definidos por horas. Ex: "Cáculo I possui 4 horas semanais, portanto 4 créditos."
   horario       String?
-
-
   curso         Curso          @relation(fields: [cursoId], references: [id])
   historicos    HistoricoAlunoDisciplina[]
   disciplinasEmCurso DisciplinaEmCurso[]
-
   createdAt     DateTime       @default(now())
-
   Docente Docente[]
 }
 
 model HistoricoAlunoDisciplina {
   id            Int           @id @default(autoincrement())
   codigo        String?
-
   discenteId    Int
   docenteId     Int?
   disciplinaId  Int
-
   semestre      String        // Semestre em que a disciplina foi cursada
   quantidadeProvas Int
   quantidadeFaltas Int
   mediaFinal    Float?
- 
   discente      Discente       @relation(fields: [discenteId], references: [id])
   docente       Docente?       @relation(fields: [docenteId], references: [id])
   disciplina    Disciplina     @relation(fields: [disciplinaId], references: [id])
-
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @default(now())
 }
 
 model DisciplinaEmCurso {
   id            Int           @id @default(autoincrement())
-  
   discenteId    Int
   docenteId     Int?
   disciplinaId  Int
-  
   semestre      String        // Semestre em que a disciplina foi cursada
   quantidadeProvas Int
   quantidadeFaltas Int
   mediaFinal    Float?
   horario       String
-  
   notaDoDiscente Float?
   status        DisciplinaStatus
-  
   discente      Discente       @relation(fields: [discenteId], references: [id])
   docente       Docente?       @relation(fields: [docenteId], references: [id])
   disciplina    Disciplina     @relation(fields: [disciplinaId], references: [id])
