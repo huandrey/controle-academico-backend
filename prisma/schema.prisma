@@ -116,6 +116,7 @@ model Disciplina {
 
 model HistoricoAlunoDisciplina {
   id            Int           @id @default(autoincrement())
+  codigo        String?
 
   discenteId    Int
   docenteId     Int?

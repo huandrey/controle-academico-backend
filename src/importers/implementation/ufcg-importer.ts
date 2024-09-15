@@ -2,7 +2,7 @@ import axios from 'axios'
 import * as cheerio from 'cheerio' // Importação correta
 import he from 'he'
 import { Importer } from '../importer'
-import { Disciplina, DisciplinaStatus } from '@prisma/client'
+import { Disciplina, DisciplinaStatus, HistoricoAlunoDisciplina } from '@prisma/client'
 import iconv from 'iconv-lite';
 
 export class UFCGImporter implements Importer {
@@ -132,13 +132,13 @@ export class UFCGImporter implements Importer {
   }
 
   public async montaDisciplinaEBuscaInformacoes(cookies: string[], historicoHtml$: cheerio.CheerioAPI, discenteId: number) {
-    const disciplinas: any = []
+    const disciplinas: HistoricoAlunoDisciplina[] = []
     const codigos: string[] = []
     const trsDisciplinas = historicoHtml$("div[id=disciplinas] > table > tbody > tr").toArray()
 
     for (const el of trsDisciplinas) {
       const tds = historicoHtml$(el).find("td")
-      const disciplina = {
+      const disciplina: HistoricoAlunoDisciplina = {
         codigo: tds.eq(0).text() || '',
         nome: this.cleanText(tds.eq(1).text()) || '',
         creditos: parseInt(tds.eq(3).text() || '0', 10),

@@ -1,6 +1,6 @@
 import { Discente, Disciplina, User } from "@prisma/client"
 import { UserDTO } from "../dtos/user-dto"
-import { DiscenteDTO } from "../dtos/student-dto"
+import { DiscenteDTO } from "../dtos/discente-dto"
 
 export interface IDatabase {
   criaUsuario(data: UserDTO): Promise<User>

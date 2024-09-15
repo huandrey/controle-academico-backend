@@ -39,8 +39,6 @@ export class SistemaController {
       this.configuraSistemaDoUsuario(sessionDTO)
       res.status(200).json({ message: 'Conexão com o sistema criada com sucesso!' })
     } catch (error) {
-      console.log('erro sistema')
-      console.log(error)
       if (error instanceof ReportarErrorAoSistema) {
         res.status(400).send({
           message: error.message
