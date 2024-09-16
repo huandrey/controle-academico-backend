@@ -2,8 +2,9 @@ import axios from 'axios'
 import * as cheerio from 'cheerio' // Importação correta
 import he from 'he'
 import { Importer } from '../importer'
-import { Disciplina, DisciplinaStatus, HistoricoAlunoDisciplina } from '@prisma/client'
+import { Disciplina, DisciplinaEmCurso, DisciplinaStatus, HistoricoAlunoDisciplina } from '@prisma/client'
 import iconv from 'iconv-lite';
+import { v4 as uuidv4 } from 'uuid';
 
 export class UFCGImporter implements Importer {
   private URL_BASE = "https://pre.ufcg.edu.br:8443/ControleAcademicoOnline/Controlador"
@@ -139,16 +140,19 @@ export class UFCGImporter implements Importer {
     for (const el of trsDisciplinas) {
       const tds = historicoHtml$(el).find("td")
       const disciplina: HistoricoAlunoDisciplina = {
+        id: uuidv4(),
         codigo: tds.eq(0).text() || '',
         nome: this.cleanText(tds.eq(1).text()) || '',
-        creditos: parseInt(tds.eq(3).text() || '0', 10),
         quantidadeProvas: this.calcularQtdeNotas(parseInt(tds.eq(3).text() || '0', 10)),
         quantidadeFaltas: this.calcularQtdeFaltas(parseInt(tds.eq(3).text() || '0', 10)),
         semestre: tds.eq(7).text() || '',
         mediaFinal: isNaN(parseFloat(tds.eq(5).text().replace(",", "."))) ? null : parseFloat(tds.eq(5).text().replace(",", ".")),
-        status: '',
-        cursoId: 1,
         discenteId,
+        docenteId: null,
+        disciplinaId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        status: 'APENAS_MEDIA_APROVADO'
       }
 
       switch (tds.eq(6).text()) {
@@ -208,12 +212,12 @@ export class UFCGImporter implements Importer {
     }
   }
 
-  private findDisciplina(disciplinas: Disciplina[], codigos: string[], codigo: string): Disciplina | undefined {
-    const disciplinasFind = disciplinas.filter((disciplina, index) => codigos[index] === codigo)
+  private findDisciplina(disciplinas: DisciplinaEmCurso[], codigos: string[], codigo: string): DisciplinaEmCurso | undefined {
+    const disciplinasFind = disciplinas.filter((_, index) => codigos[index] === codigo)
 
     return disciplinasFind.reduce((latest, disciplina) => {
       return (!latest || disciplina.semestre > latest.semestre) ? disciplina : latest
-    }, undefined as Disciplina | undefined)
+    }, undefined as DisciplinaEmCurso | undefined)
   }
 
   private calcularQtdeNotas(creditos: number): number {

@@ -109,12 +109,14 @@ model Disciplina {
 }
 
 model HistoricoAlunoDisciplina {
-  id            Int           @id @default(autoincrement())
-  codigo        String?
+  id            String           @id @unique
+  codigo        String? 
+  nome          String
   discenteId    Int
   docenteId     Int?
   disciplinaId  Int
   semestre      String        // Semestre em que a disciplina foi cursada
+  status        DisciplinaStatus
   quantidadeProvas Int
   quantidadeFaltas Int
   mediaFinal    Float?
@@ -126,7 +128,7 @@ model HistoricoAlunoDisciplina {
 }
 
 model DisciplinaEmCurso {
-  id            Int           @id @default(autoincrement())
+  id            Int           @id @unique @default(autoincrement())
   discenteId    Int
   docenteId     Int?
   disciplinaId  Int

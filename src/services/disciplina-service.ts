@@ -22,7 +22,7 @@ export class DisciplinaService implements IDisciplinaService {
 
       const { matricula, senha, discenteId } = sessionDTO
 
-      const disciplinasImportadas = await importer.importaDisciplinas(discenteId!, matricula, senha)
+const disciplinasImportadas = await importer.importaDisciplinas(discenteId!, matricula, senha)
       console.log(`importUserData: ${JSON.stringify(disciplinasImportadas, null, 2)}`)
 
       const countDisciplinasCriadas = await this.disciplinaRepository.saveDisciplinas(disciplinasImportadas)
