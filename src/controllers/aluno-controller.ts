@@ -1,20 +1,20 @@
 import { Request, Response } from 'express'
-import { DiscenteDTO } from '../dtos/discente-dto'
-import { IDiscenteService } from '../services/discente-service'
+import { AlunoDTO } from '../dtos/aluno-dto'
+import { IAlunoService } from '../services/aluno-service'
 import { ReportarErrorAoSistema } from '../exceptions/ReportarErroAoSistema'
 
-export class DiscenteController {
-  private discenteService: IDiscenteService
+export class AlunoController {
+  private AlunoService: IAlunoService
 
-  constructor(discenteService: IDiscenteService) {
-    this.discenteService = discenteService
+  constructor(AlunoService: IAlunoService) {
+    this.AlunoService = AlunoService
   }
 
-  public async criaDiscente(req: Request, res: Response): Promise<void> {
-    const discente: DiscenteDTO = req.body
+  public async criaAluno(req: Request, res: Response): Promise<void> {
+    const aluno: AlunoDTO = req.body
 
     try {
-      await this.discenteService.lidaComCriacaoDoDiscente(discente)
+      await this.AlunoService.lidaComCriacaoDoAluno(aluno)
       res.status(201).json({ message: "Aluno criado com sucesso!" })
     } catch (error) {
       if (error instanceof ReportarErrorAoSistema) {
@@ -26,11 +26,11 @@ export class DiscenteController {
     }
   }
 
-  public async buscaDiscentePorId(req: Request, res: Response): Promise<void> {
-    const discenteId = parseInt(req.params.id, 10)
+  public async buscaAlunoPorId(req: Request, res: Response): Promise<void> {
+    const AlunoId = parseInt(req.params.id, 10)
 
     try {
-      const student = await this.discenteService.lidaComBuscaDoDiscentePorId(discenteId)
+      const student = await this.AlunoService.lidaComBuscaDoAlunoPorId(AlunoId)
       if (student) {
         res.status(200).json(student)
       } else {
@@ -46,11 +46,11 @@ export class DiscenteController {
     }
   }
 
-  public async buscaDiscentePorMatricula(req: Request, res: Response): Promise<void> {
+  public async buscaAlunoPorMatricula(req: Request, res: Response): Promise<void> {
     const matricula = req.body.matricula
 
     try {
-      const student = await this.discenteService.lidaComBuscaDoDiscentePorMatricula(matricula)
+      const student = await this.AlunoService.lidaComBuscaDoAlunoPorMatricula(matricula)
       if (student) {
         res.status(200).json(student)
       } else {
@@ -66,12 +66,12 @@ export class DiscenteController {
     }
   }
 
-  public async atualizaDiscente(req: Request, res: Response): Promise<void> {
-    const discenteId = parseInt(req.params.id, 10)
-    const discente: DiscenteDTO = req.body
+  public async atualizaAluno(req: Request, res: Response): Promise<void> {
+    const AlunoId = parseInt(req.params.id, 10)
+    const Aluno: AlunoDTO = req.body
 
     try {
-      const updatedStudent = await this.discenteService.lidaComAtualizacaoDoDiscente(discenteId, discente)
+      const updatedStudent = await this.AlunoService.lidaComAtualizacaoDoAluno(AlunoId, Aluno)
       if (updatedStudent) {
         res.status(200).json(updatedStudent)
       } else {
@@ -87,11 +87,11 @@ export class DiscenteController {
     }
   }
 
-  public async deletaDiscente(req: Request, res: Response): Promise<void> {
-    const discenteId = parseInt(req.params.id, 10)
+  public async deletaAluno(req: Request, res: Response): Promise<void> {
+    const AlunoId = parseInt(req.params.id, 10)
 
     try {
-      await this.discenteService.lidaComRemocaoDoDiscente(discenteId)
+      await this.AlunoService.lidaComRemocaoDoAluno(AlunoId)
       res.status(204).send()
     } catch (error) {
       if (error instanceof ReportarErrorAoSistema) {

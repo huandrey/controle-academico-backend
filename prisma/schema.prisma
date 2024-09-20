@@ -37,11 +37,11 @@ model User {
   token     String?  
   role      Role     @default(DISCENTE)
   createdAt DateTime @default(now())
-  discente  Discente?
+  discente  Aluno?
   docente   Docente?
 }
 
-model Discente {
+model Aluno {
   id          Int      @id @default(autoincrement())
   nome        String
   matricula   String   @unique @db.VarChar(9) 
@@ -65,7 +65,7 @@ model LivroEmprestadoBiblioteca {
   anotacoesSobreOLivro String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @default(now())
-  discente      Discente?      
+  discente      Aluno?      
 }
 
 
@@ -89,7 +89,7 @@ model Curso {
   nome          String
   createdAt     DateTime     @default(now())
   universidade  Universidade @relation(fields: [universidadeId], references: [id])
-  discentes     Discente[]
+  discentes     Aluno[]
   docentes      Docente[]
   disciplinas   Disciplina[]
 }
@@ -120,7 +120,7 @@ model HistoricoAlunoDisciplina {
   quantidadeProvas Int
   quantidadeFaltas Int
   mediaFinal    Float?
-  discente      Discente       @relation(fields: [discenteId], references: [id])
+  discente      Aluno       @relation(fields: [discenteId], references: [id])
   docente       Docente?       @relation(fields: [docenteId], references: [id])
   disciplina    Disciplina     @relation(fields: [disciplinaId], references: [id])
   createdAt     DateTime       @default(now())
@@ -139,7 +139,7 @@ model DisciplinaEmCurso {
   horario       String
   notaDoDiscente Float?
   status        DisciplinaStatus
-  discente      Discente       @relation(fields: [discenteId], references: [id])
+  discente      Aluno       @relation(fields: [discenteId], references: [id])
   docente       Docente?       @relation(fields: [docenteId], references: [id])
   disciplina    Disciplina     @relation(fields: [disciplinaId], references: [id])
 }

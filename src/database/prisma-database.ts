@@ -1,8 +1,8 @@
 // src/database/PrismaDatabase.tsimport { PrismaClient } from'@prisma/client'
-import { Discente, Disciplina, PrismaClient, User } from '@prisma/client'
+import { Aluno, Disciplina, PrismaClient, User } from '@prisma/client'
 import { UserDTO } from '../dtos/user-dto'
 import { IDatabase } from'./database-interface'
-import { DiscenteDTO } from '../dtos/discente-dto'
+import { AlunoDTO } from '../dtos/aluno-dto'
 import { PrismaClientInitializationError } from '@prisma/client/runtime/library'
 
 const prisma = new PrismaClient()
@@ -40,24 +40,24 @@ export class PrismaDatabase implements IDatabase {
   buscaUsuarioPorEmail(email: string): Promise<User | null> {
     throw new Error('Method not implemented.')
   }
-  atualizaDiscente(id: number, data: Partial<DiscenteDTO>): Promise<Discente> {
+  atualizaAluno(id: number, data: Partial<AlunoDTO>): Promise<Aluno> {
     throw new Error('Method not implemented.')
   }
-  deletaDiscente(id: number): Promise<void> {
+  deletaAluno(id: number): Promise<void> {
     throw new Error('Method not implemented.')
   }
-  buscaDiscentePorId(id: number): Promise<Discente | null> {
+  buscaAlunoPorId(id: number): Promise<Aluno | null> {
     throw new Error('Method not implemented.')
   }
-  buscaDiscentePorMatricula(matricula: string): Promise<Discente> {
+  buscaAlunoPorMatricula(matricula: string): Promise<Aluno> {
     throw new Error('Method not implemented.')
   }
-  buscaDiscentePorEmail(email: string): Promise<Discente> {
+  buscaAlunoPorEmail(email: string): Promise<Aluno> {
     throw new Error('Method not implemented.')
   }
-  criaDiscente(data: DiscenteDTO): Promise<Discente> {
+  criaAluno(data: AlunoDTO): Promise<Aluno> {
     console.log(data)
-    const discente = prisma.discente.create({ 
+    const aluno = prisma.aluno.create({ 
       data: {
         nome: data.nome,
         matricula: data.matricula,
@@ -74,7 +74,7 @@ export class PrismaDatabase implements IDatabase {
       },
     })
 
-    return discente
+    return aluno
   }
 
   async criaUsuario(data: UserDTO): Promise<User> {
