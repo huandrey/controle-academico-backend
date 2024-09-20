@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { PayloadUserAlreadyExists } from "../middlewares/autorizacao-middleware";
 import { UserService } from "../services/user-service";
-import { DiscenteService } from "../services/discente-service";
+import { AlunoService } from "../services/aluno-service";
 import { DisciplinaService } from "../services/disciplina-service";
 import { SessionDTO } from "../dtos/session-dto";
 import { SistemaService } from "../services/sistema-service";
@@ -9,82 +9,38 @@ import { ReportarErrorAoSistema } from "../exceptions/ReportarErroAoSistema";
 
 export class SistemaController {
   private userService: UserService
-  private discenteService: DiscenteService
+  private alunoService: AlunoService
   private disciplinaService: DisciplinaService
-  private sistemaService: SistemaService
+  private sistemaService
 
-  constructor(userService: UserService, discenteService: DiscenteService, disciplinaService: DisciplinaService, sistemaService: SistemaService) {
+  constructor(userService: UserService, alunoService: AlunoService, disciplinaService: DisciplinaService, sistemaService: any) {
     this.userService = userService,
-    this.discenteService = discenteService
+    this.alunoService = alunoService
     this.disciplinaService = disciplinaService
     this.sistemaService = sistemaService
   }
 
-  public async criaConexaoComSistema(req: Request, res: Response): Promise<void> {
-    interface CustomRequest extends Request {
-      user: PayloadUserAlreadyExists;
-    }
+  public async autenticaAluno(req: Request, res: Response): Promise<void> {
+    const { matricula, password } = req.body
 
-    // customReq agora compartilha o mesmo acesso de memória que req 
-    // const customReq: CustomRequest = req as CustomRequest;
-
-    // const { userAlreadyExists  } = customReq.user;
-
-    // if (userAlreadyExists) {
-    //   this.retornaDadosDoDiscente()
-    // }
-
-    const sessionDTO: SessionDTO = req.body;
     try {
-      this.configuraSistemaDoUsuario(sessionDTO)
-      res.status(200).json({ message: 'Conexão com o sistema criada com sucesso!' })
+      const user = await this.sistemaService.lidaComAutenticacaoDoUsuario()
+
+      if (user) {
+        res.status(200).json({
+          message: 'Autenticado com sucesso!',
+          data: user
+        })
+      } else {
+        res.status(401).json({ error: 'Usuário ou senha inválidos' })
+      }
     } catch (error) {
       if (error instanceof ReportarErrorAoSistema) {
-        res.status(400).send({
-          message: error.message
-        })
+        res.status(400).json({ error: error.message })
+      } else {
+        console.error(error)
       }
     }
-  }
-
-  public atualizaSistema(): void {
-    // Implementar a atualização do sistema
-  }
-
-  private retornaDadosDoDiscente(): void {
-    // Implementar a consulta dos dados do discente
-  }
-
-  // Implementar a configuração do sistema do usuário
-  private async configuraSistemaDoUsuario(sessionDTO: SessionDTO) {
-   try {
-    const importer = this.sistemaService.lidaComIdentificacaoDaInstituicaoDeEnsino(sessionDTO.vinculo)
-    const dadosDiscente = importer.autenticaUsuario(sessionDTO.matricula, sessionDTO.senha)
-    // Cria usuário
-    const usuario = await this.userService.lidaComCriacaoDoUsuario({ nome: '', role: 'DISCENTE' })
-   
-    if (!usuario) {
-      throw new Error('Erro ao cadastrar o usuário')
-    }
-
-    const discente = await this.discenteService.lidaComCriacaoDoDiscente({
-      nome: '',
-      matricula: sessionDTO.matricula,
-      cursoId: 1, // Adicionar o ID do curso
-      userId: usuario!.id, // Adicionar o ID do usuário
-    });
-
-    if (!discente) {
-      throw new Error('Erro ao cadastrar o discente')
-    }
-
-    // Identifica a instituição que o aluno possui vínculo
-
-     // Importa e salva disciplinas do usuário
-    this.disciplinaService.lidaComImportacaoDasDisciplinasDoDiscente({ ...sessionDTO, discenteId: discente.id }, importer)
-   } catch (error) {
-    throw error
-   }
   }
 
 }

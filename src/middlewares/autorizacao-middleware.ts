@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { DiscenteService, IDiscenteService } from "../services/discente-service";
+import { AlunoService, IAlunoService } from "../services/aluno-service";
 import jwt from 'jsonwebtoken'
 import { ReportarErrorAoSistema } from "../exceptions/ReportarErroAoSistema";
 
@@ -16,13 +16,13 @@ export interface PayloadUserAlreadyExists extends Partial<PayloadToken>  {
 
 export class AutorizacaoMiddleware {
   private segredo: string;
-  private discenteService?: DiscenteService
+  private alunoService?: AlunoService
 
-  constructor(discenteService?: DiscenteService) {
+  constructor(alunoService?: AlunoService) {
     this.segredo = process.env.JWT_SECRET || 'segredo_padrao'
-    this.discenteService = discenteService
+    this.alunoService = alunoService
 
-    console.log(discenteService)
+    console.log(alunoService)
   }
 
   public autorizarApenas(roleNecessaria: string) {
@@ -56,21 +56,21 @@ export class AutorizacaoMiddleware {
 
     /**
    *  Esse método checa se um usuário já existe no sistema, ou seja, se já foi adicionado a base
-   * Se a classe `discenteService` não for inicializa por algum motivo e esse método for chamada você receberá um erro.
+   * Se a classe `alunoService` não for inicializa por algum motivo e esse método for chamada você receberá um erro.
    * @param {Request} req - The Express request object.
    * @param {Response} res - The Express response object.
    * @param {NextFunction} next - The Express next middleware function.
-   * @throws {Error} If the `discenteService` is not properly initialized, a warning message will be returned.
+   * @throws {Error} If the `alunoService` is not properly initialized, a warning message will be returned.
    */
   public async verificaSeAlunoJaExisteNoSistema(req: Request, res: Response, next: NextFunction) {
     const { matricula } = req.body;
     
-    if (!this.discenteService) {
-      throw new ReportarErrorAoSistema("DiscenteService is undefined. Por favor, verifique se a propriedade foi inicializada corretamente.")
+    if (!this.alunoService) {
+      throw new ReportarErrorAoSistema("AlunoService is undefined. Por favor, verifique se a propriedade foi inicializada corretamente.")
     }
 
     try {
-      const aluno = await this.discenteService.lidaComBuscaDoDiscentePorMatricula(matricula);
+      const aluno = await this.alunoService.lidaComBuscaDoAlunoPorMatricula(matricula);
 
       interface CustomRequest extends Request {
         user: PayloadUserAlreadyExists;
