@@ -1,18 +1,16 @@
-import { UserRepository } from './../repositories/user-repository'
 import { Router } from 'express'
-import { UserController } from '../controllers/user-controller'
-import { UserService } from '../services/user-service'
 import { PrismaDatabase } from '../database/prisma-database'
+import { AuthController } from '../controllers/auth-controller'
+import { AuthService } from '../services/auth-service'
+import { AuthRepository } from '../repositories/auth-repository'
 
 const router = Router()
 const database = new PrismaDatabase();
 
-const userRepository = new UserRepository(database)
-const userService = new UserService(userRepository)
-const userController = new UserController(userService)
+const authRepository = new AuthRepository(database)
+const authService = new AuthService(authRepository)
+const authController = new AuthController(authService)
 
-router.post('create', userController.criaUsuario.bind(userController))
-router.post('update', userController.atualizaUsuario.bind(userController))
-router.delete('delete', userController.deletaUsuario.bind(userController));
+router.post('/token/generate', authController.gerarToken.bind(authController))
 
-export { router as userRoutes }
+export { router as authRoutes }

@@ -1,17 +1,46 @@
 // src/database/PrismaDatabase.tsimport { PrismaClient } from'@prisma/client'
-import { Discente, PrismaClient, User } from '@prisma/client'
+import { Discente, Disciplina, PrismaClient, User } from '@prisma/client'
 import { UserDTO } from '../dtos/user-dto'
 import { IDatabase } from'./database-interface'
-import { StudentDTO } from '../dtos/student-dto'
 import { DiscenteDTO } from '../dtos/discente-dto'
+import { PrismaClientInitializationError } from '@prisma/client/runtime/library'
 
 const prisma = new PrismaClient()
 
 export class PrismaDatabase implements IDatabase {
+  async salvaDisciplinas(data: Disciplina[]): Promise<number> {
+    try {
+      const disciplinas = await prisma.disciplina.createMany({ data })
+  
+      return disciplinas.count
+    } catch (error) {
+      if (error instanceof PrismaClientInitializationError) {
+        console.error('Erro ao inicializar o Prisma Client:', error.message)
+      } else {
+        console.error('Erro desconhecido ao salvar disciplinas:', error)
+      }
+      throw error
+    }
+  }
+
+  async buscaPorUsuarios(): Promise<User[] | null> {
+    return await prisma.user.findMany()
+  }
+  
+  async adicionaTokenDeAutenticacao(id: number, token: string): Promise<void> {
+    await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        token
+      }
+    })
+  }
   buscaUsuarioPorEmail(email: string): Promise<User | null> {
     throw new Error('Method not implemented.')
   }
-  atualizaDiscente(id: number, data: Partial<StudentDTO>): Promise<Discente> {
+  atualizaDiscente(id: number, data: Partial<DiscenteDTO>): Promise<Discente> {
     throw new Error('Method not implemented.')
   }
   deletaDiscente(id: number): Promise<void> {
@@ -27,6 +56,7 @@ export class PrismaDatabase implements IDatabase {
     throw new Error('Method not implemented.')
   }
   criaDiscente(data: DiscenteDTO): Promise<Discente> {
+    console.log(data)
     const discente = prisma.discente.create({ 
       data: {
         nome: data.nome,

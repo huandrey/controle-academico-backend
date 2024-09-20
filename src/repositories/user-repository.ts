@@ -8,6 +8,7 @@ export interface IUserRepository {
   deletaUsuario(id: number): Promise<void>
   buscaUsuarioPorId(id: number): Promise<User | null>
   buscaUsuarioPorEmail(email: string): Promise<User | null>
+  buscaUsuarios(): Promise<User[] | null>
 }
 
 export type UpdateUserDTO = {
@@ -33,6 +34,7 @@ export class UserRepository implements IUserRepository {
     const user = await this.orm.criaUsuario(data)
     return {
       id: user.id,
+      token: '',
       nome: user.nome,
       role: user.role,
       createdAt: user.createdAt
@@ -53,5 +55,9 @@ export class UserRepository implements IUserRepository {
 
   async findUserByEmail(email: string): Promise<User | null> {
     return this.orm.buscaUsuarioPorEmail(email)
+  }
+
+  async buscaUsuarios(): Promise<User[] | null> {
+    return this.orm.buscaPorUsuarios()
   }
 }

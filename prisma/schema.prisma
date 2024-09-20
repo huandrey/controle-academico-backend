@@ -10,7 +10,7 @@ datasource db {
 enum Role {
   ADMIN     // Administrador do sistema
   DISCENTE  // Aluno de alguma instituição que usa o sistema
-  DOCENTE   // Professor de alguma instituição que usa o sistema
+  DOCENTE   // Professor de alguma instituição casastrado
 }
 
 enum DisciplinaStatus {
@@ -18,11 +18,7 @@ enum DisciplinaStatus {
   APENAS_MEDIA_REPROVADO     // A disciplina foi registrada como nota insuficiente e reprovado no sistema
   REPROVADO_POR_FALTA        // A disciplina foi registrada como aluno reprovado por falta
   TRANCADA                   // A disciplina foi registrada como trancada pelo aluno
-}
-
-enum DisciplinaEmCursoStatus {
-  EM_PROGRESSO               // A disciplina está em curso
-  TRANCADA                   // O aluno trancou a disciplina
+  EM_PROGRESSO
 }
 
 model Universidade {
@@ -38,6 +34,7 @@ model Universidade {
 model User {
   id        Int      @id @default(autoincrement())
   nome      String
+  token     String?  
   role      Role     @default(DISCENTE)
   createdAt DateTime @default(now())
   discente  Discente?
@@ -47,7 +44,7 @@ model User {
 model Discente {
   id          Int      @id @default(autoincrement())
   nome        String
-  matricula   String   @unique @db.VarChar(6) 
+  matricula   String   @unique @db.VarChar(9) 
   cursoId     Int
   userId      Int      @unique
   livroId     Int?     @unique
@@ -82,6 +79,7 @@ model Docente {
   curso     Curso    @relation(fields: [cursoId], references: [id])
   disciplinas   Disciplina[]
   disciplinasEmCurso  DisciplinaEmCurso[]
+
   historicos  HistoricoAlunoDisciplina[]
 }
 
@@ -98,41 +96,49 @@ model Curso {
 
 model Disciplina {
   id            Int           @id @default(autoincrement())
+  cursoId       Int
+  codigo        String?        
   nome          String
   creditos      Int           // Créditos são definidos por horas. Ex: "Cáculo I possui 4 horas semanais, portanto 4 créditos."
-  semestre      Int           // Semestre em que a disciplina foi cursada
-  quantidadeProvas Int
-  quantidadeFaltas Int
-  mediaFinal    Float?
-  docenteId     Int?
-  status        DisciplinaStatus
-  cursoId       Int
-  createdAt     DateTime       @default(now())
-  docente       Docente?       @relation(fields: [docenteId], references: [id])
+  horario       String?
   curso         Curso          @relation(fields: [cursoId], references: [id])
   historicos    HistoricoAlunoDisciplina[]
   disciplinasEmCurso DisciplinaEmCurso[]
+  createdAt     DateTime       @default(now())
+  Docente Docente[]
 }
 
 model HistoricoAlunoDisciplina {
-  id            Int           @id @default(autoincrement())
+  id            String           @id @unique
+  codigo        String? 
+  nome          String
   discenteId    Int
   docenteId     Int?
   disciplinaId  Int
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @default(now())
+  semestre      String        // Semestre em que a disciplina foi cursada
+  status        DisciplinaStatus
+  quantidadeProvas Int
+  quantidadeFaltas Int
+  mediaFinal    Float?
   discente      Discente       @relation(fields: [discenteId], references: [id])
   docente       Docente?       @relation(fields: [docenteId], references: [id])
   disciplina    Disciplina     @relation(fields: [disciplinaId], references: [id])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now())
 }
 
 model DisciplinaEmCurso {
-  id            Int           @id @default(autoincrement())
+  id            Int           @id @unique @default(autoincrement())
   discenteId    Int
   docenteId     Int?
   disciplinaId  Int
+  semestre      String        // Semestre em que a disciplina foi cursada
+  quantidadeProvas Int
+  quantidadeFaltas Int
+  mediaFinal    Float?
+  horario       String
   notaDoDiscente Float?
-  status        DisciplinaEmCursoStatus
+  status        DisciplinaStatus
   discente      Discente       @relation(fields: [discenteId], references: [id])
   docente       Docente?       @relation(fields: [docenteId], references: [id])
   disciplina    Disciplina     @relation(fields: [disciplinaId], references: [id])

@@ -2,7 +2,7 @@ import { Disciplina } from "@prisma/client";
 import { IDatabase } from "../database/database-interface";
 
 export interface IDisciplinaRepository {
-  saveDisciplinas(disciplinas: any): Promise<Disciplina[]>
+  saveDisciplinas(disciplinas: Disciplina[]): Promise<number>
 }
 
 export class DisciplinaRepository implements IDisciplinaRepository {
@@ -12,7 +12,7 @@ export class DisciplinaRepository implements IDisciplinaRepository {
     this.orm = orm
   }
 
-  saveDisciplinas(disciplinas: any): Promise<Disciplina[]> {
-    throw new Error("Method not implemented.");
+  saveDisciplinas(disciplinas: Disciplina[]): Promise<number> {
+    return this.orm.salvaDisciplinas(disciplinas)
   }
 }

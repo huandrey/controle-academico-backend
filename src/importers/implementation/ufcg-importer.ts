@@ -1,27 +1,12 @@
 import axios from 'axios'
 import * as cheerio from 'cheerio' // Importação correta
 import he from 'he'
+import { Importer } from '../importer'
+import { Disciplina, DisciplinaEmCurso, DisciplinaStatus, HistoricoAlunoDisciplina } from '@prisma/client'
+import iconv from 'iconv-lite';
+import { v4 as uuidv4 } from 'uuid';
 
-export interface Disciplina {
-  nome: string
-  creditos: number
-  quantidadeProvas: number
-  quantidadeFaltas: number
-  semestre: string
-  mediaFinal: number | null
-  status: string
-  details?: string
-}
-
-enum DisciplinaStatus {
-  APENAS_MEDIA_APROVADO = "APENAS_MEDIA_APROVADO",
-  APENAS_MEDIA_REPROVADO = "APENAS_MEDIA_REPROVADO",
-  REPROVADO_POR_FALTA = "REPROVADO_POR_FALTA",
-  TRANCADA = "TRANCADA",
-  EM_PROGRESSO = "EM_PROGRESSO"
-}
-
-export class UFCGImporter {
+export class UFCGImporter implements Importer {
   private URL_BASE = "https://pre.ufcg.edu.br:8443/ControleAcademicoOnline/Controlador"
   private URL_LOGIN = this.URL_BASE
   private LOGIN = "login"
@@ -37,7 +22,7 @@ export class UFCGImporter {
   private ERRO_AUTENTICACAO = "ERRO NA AUTENTICAÇÃO"
   public static readonly ERRO = "Matrícula inválida ou senha incorreta."
 
-  private reportProgress(message: string): void {
+  reportProgress(message: string): void {
     console.log(message) // Implement your progress reporting logic here
   }
 
@@ -46,101 +31,85 @@ export class UFCGImporter {
     .replace(/\s+/g, ' ')
     .trim() // Remove espaços em branco no início e no final
   }
-  
-  public async importDisciplinas(login: string, senha: string, vinculo: string): Promise<Disciplina[]> {
-    const disciplinas: Disciplina[] = []
-    const codigos: string[] = []
-    this.reportProgress("Tentando fazer login...")
 
+  public async autenticaUsuario(matricula: string, senha: string): Promise<string[]> {
+    this.reportProgress('Autenticando usuário...')
     try {
-      // Se autentica e armazena o cookie
       const response = await axios.post(this.URL_LOGIN, new URLSearchParams({
-        [this.LOGIN]: login,
+        [this.LOGIN]: matricula,
         [this.SENHA]: senha,
         [this.COMMAND]: this.ALUNO_LOGIN
       }), {
         timeout: 10000,
         withCredentials: true,
         validateStatus: () => true,
-        responseType: 'text', 
         httpsAgent: new (require('https').Agent)({
           rejectUnauthorized: false
-        })
+        }),
+        responseType: 'arraybuffer', // Receber os dados como array buffer
+        responseEncoding: 'binary',
       })
-
+     
       const cookies: string[] = response.headers['set-cookie']!
-      const $ = cheerio.load(response.data) // Carregando o HTML
+      
+      let html = iconv.decode(Buffer.from(response.data), 'ISO-8859-1')
+      html = html.replace(/<meta[^>]*charset=["']?[^"'>]+["']?[^>]*>/i, '<meta charset="UTF-8">')
+
+      const $ = cheerio.load(html) 
 
       if ($('head').text().includes(this.ERRO_AUTENTICACAO) || $('body').text().includes(UFCGImporter.ERRO)) {
-        throw new Error("Authentication Failed")
+        throw new Error("A autenticação do aluno falhou")
       }
 
-      // Abre a página do Histórico e pega o texto das disciplinas
-      this.reportProgress("Obtendo histórico...")
+      console.log($)
+
+      return cookies
+    } catch (error) {
+      throw error
+    }
+  }
+
+  public async buscaHistoricoDoDiscente(cookies: string[]) {
+    this.reportProgress("Obtendo histórico...")
+    try {
       const historicoResponse = await axios.get(this.URL_LOGIN, {
         params: { [this.COMMAND]: "AlunoHistorico" },
         headers: { Cookie: cookies.join(' ') },
         timeout: 10000,
         httpsAgent: new (require('https').Agent)({
           rejectUnauthorized: false
-        })
+        }),
+        responseType: 'arraybuffer', // Receber os dados como array buffer
+        responseEncoding: 'binary',
       })
 
-      const historico$ = cheerio.load(historicoResponse.data)
-      const trsDisciplinas: any = historico$("div[id=disciplinas] > table > tbody > tr").toArray()
+      let htmlHistoricoResponse = iconv.decode(Buffer.from(historicoResponse.data), 'ISO-8859-1')
+      htmlHistoricoResponse = htmlHistoricoResponse.replace(/<meta[^>]*charset=["']?[^"'>]+["']?[^>]*>/i, '<meta charset="UTF-8">')
+      const historico$ = cheerio.load(htmlHistoricoResponse)
 
-      for (const el of trsDisciplinas) {
-        const tds = historico$(el).find("td")
-        const disciplina: Disciplina = {
-          nome: this.cleanText(tds.eq(1).text()) || '',
-          creditos: parseInt(tds.eq(3).text() || '0', 10),
-          quantidadeProvas: this.calcularQtdeNotas(parseInt(tds.eq(3).text() || '0', 10)),
-          quantidadeFaltas: this.calcularQtdeFaltas(parseInt(tds.eq(3).text() || '0', 10)),
-          semestre: tds.eq(7).text() || '',
-          mediaFinal: isNaN(parseFloat(tds.eq(5).text().replace(",", "."))) ? null : parseFloat(tds.eq(5).text().replace(",", ".")),
-          status: ''
-        }
+      return historico$
+    } catch (error) {
+      throw error
+    }
+  } 
 
-        switch (tds.eq(6).text()) {
-          case this.APROVADO:
-          case this.DISPENSA:
-            disciplina.status = DisciplinaStatus.APENAS_MEDIA_APROVADO
-            if (disciplina.mediaFinal === null) {
-              disciplina.mediaFinal = 7.0
-            }
-            break
-          case this.REPROVADO:
-            disciplina.status = DisciplinaStatus.APENAS_MEDIA_REPROVADO
-            break
-          case this.REP_FALTA:
-            disciplina.status = DisciplinaStatus.REPROVADO_POR_FALTA
-            disciplina.mediaFinal = 0
-            break
-          case this.TRANCADO:
-            disciplina.status = DisciplinaStatus.TRANCADA
-          default:
-            disciplina.status = DisciplinaStatus.EM_PROGRESSO
-            break
-        }
-
-        disciplinas.push(disciplina)
-        codigos.push(tds.eq(0).text() || '')
-      }
-
-      if (disciplinas.length === 0) {
-        throw new Error("Você não possui histórico acadêmico")
-      }
-
-      this.reportProgress("Obtendo detalhes das disciplinas...")
+  public async buscaHorariosDasDisciplinas(cookies: string[], disciplinas: any, codigos: string[]) {
+    this.reportProgress('Buscando informações das disciplinas')
+    try {
       const horarioResponse = await axios.get(this.URL_BASE, {
         params: { [this.COMMAND]: "AlunoTurmasListar" },
         headers: { Cookie: cookies.join(' ') },
         httpsAgent: new (require('https').Agent)({
           rejectUnauthorized: false
-        })
+        }),
+        responseType: 'arraybuffer', // Receber os dados como array buffer
+        responseEncoding: 'binary',
       })
 
-      const horario$ = cheerio.load(horarioResponse.data)
+      let htmlHorarioResponse = iconv.decode(Buffer.from(horarioResponse.data), 'ISO-8859-1');
+      htmlHorarioResponse = htmlHorarioResponse.replace(/<meta[^>]*charset=["']?[^"'>]+["']?[^>]*>/i, '<meta charset="UTF-8">');
+      
+      const horario$ = cheerio.load(htmlHorarioResponse)
       const table = horario$("table")
 
       if (table) {
@@ -152,11 +121,82 @@ export class UFCGImporter {
           const disciplina = this.findDisciplina(disciplinas, codigos, tds.eq(1).text() || '')
 
           if (disciplina) {
-            disciplina.details = `Turma: ${tds.eq(3).text()}\nHorário: ${tds.eq(4).text()}`
+            disciplina.horario = `Turma: ${tds.eq(3).text()}\nHorário: ${tds.eq(4).text()}`
           }
         })
       }
 
+      return disciplinas
+    } catch (error) {
+      throw error
+    }
+  }
+
+  public async montaDisciplinaEBuscaInformacoes(cookies: string[], historicoHtml$: cheerio.CheerioAPI, discenteId: number) {
+    const disciplinas: HistoricoAlunoDisciplina[] = []
+    const codigos: string[] = []
+    const trsDisciplinas = historicoHtml$("div[id=disciplinas] > table > tbody > tr").toArray()
+
+    for (const el of trsDisciplinas) {
+      const tds = historicoHtml$(el).find("td")
+      const disciplina: HistoricoAlunoDisciplina = {
+        id: uuidv4(),
+        codigo: tds.eq(0).text() || '',
+        nome: this.cleanText(tds.eq(1).text()) || '',
+        quantidadeProvas: this.calcularQtdeNotas(parseInt(tds.eq(3).text() || '0', 10)),
+        quantidadeFaltas: this.calcularQtdeFaltas(parseInt(tds.eq(3).text() || '0', 10)),
+        semestre: tds.eq(7).text() || '',
+        mediaFinal: isNaN(parseFloat(tds.eq(5).text().replace(",", "."))) ? null : parseFloat(tds.eq(5).text().replace(",", ".")),
+        discenteId,
+        docenteId: null,
+        disciplinaId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        status: 'APENAS_MEDIA_APROVADO'
+      }
+
+      switch (tds.eq(6).text()) {
+        case this.APROVADO:
+        case this.DISPENSA:
+          disciplina.status = DisciplinaStatus.APENAS_MEDIA_APROVADO
+          if (disciplina.mediaFinal === null) {
+            disciplina.mediaFinal = 7.0
+          }
+          break
+        case this.REPROVADO:
+          disciplina.status = DisciplinaStatus.APENAS_MEDIA_REPROVADO
+          break
+        case this.REP_FALTA:
+          disciplina.status = DisciplinaStatus.REPROVADO_POR_FALTA
+          disciplina.mediaFinal = 0
+          break
+        case this.TRANCADO:
+          disciplina.status = DisciplinaStatus.TRANCADA
+        default:
+          disciplina.status = DisciplinaStatus.EM_PROGRESSO
+          break
+      }
+
+      disciplinas.push(disciplina)
+      codigos.push(tds.eq(0).text() || '')
+    }
+
+    if (disciplinas.length === 0) {
+      throw new Error("Você não possui histórico acadêmico")
+    }
+
+    const disciplinasAtualizadas = await this.buscaHorariosDasDisciplinas(cookies, disciplinas, codigos)
+
+    return disciplinasAtualizadas
+  }
+
+  public async importaDisciplinas(discenteId: number, matricula: string, senha: string): Promise<Disciplina[]> {
+    try {
+      const cookies: string[] = await this.autenticaUsuario(matricula, senha)
+      const historicoHtml: cheerio.CheerioAPI | undefined = await this.buscaHistoricoDoDiscente(cookies)
+      const disciplinas = await this.montaDisciplinaEBuscaInformacoes(cookies, historicoHtml!, discenteId)
+      
+      return disciplinas
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
         if (error.code === 'ECONNABORTED') {
@@ -170,16 +210,14 @@ export class UFCGImporter {
 
       throw new Error(error.message)
     }
-
-    return disciplinas
   }
 
-  private findDisciplina(disciplinas: Disciplina[], codigos: string[], codigo: string): Disciplina | undefined {
-    const disciplinasFind = disciplinas.filter((disciplina, index) => codigos[index] === codigo)
+  private findDisciplina(disciplinas: DisciplinaEmCurso[], codigos: string[], codigo: string): DisciplinaEmCurso | undefined {
+    const disciplinasFind = disciplinas.filter((_, index) => codigos[index] === codigo)
 
     return disciplinasFind.reduce((latest, disciplina) => {
       return (!latest || disciplina.semestre > latest.semestre) ? disciplina : latest
-    }, undefined as Disciplina | undefined)
+    }, undefined as DisciplinaEmCurso | undefined)
   }
 
   private calcularQtdeNotas(creditos: number): number {

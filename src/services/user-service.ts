@@ -1,12 +1,14 @@
 import { IUserRepository } from'../repositories/user-repository'
 import { UserDTO } from '../dtos/user-dto'
 import { User } from '@prisma/client'
+import { ReportarErrorAoSistema } from '../exceptions/ReportarErroAoSistema'
 
 export interface IUserService {
-  lidaComCriacaoDoUsuario(data: UserDTO): Promise<User>
+  lidaComCriacaoDoUsuario(data: UserDTO): Promise<User | null>
   lidaComBuscaDoUsuarioPorId(id: number): Promise<User | null>
   lidaComAtualizacaoDoUsuario(id: number, data: Partial<UserDTO>): Promise<User | null>
   lidaComRemocaoDoUsuario(id: number): Promise<void>
+  lidaComBuscaDosUsuarios(): Promise<User[] | null>
 }
 export class UserService implements IUserService {
   private userRepository: IUserRepository
@@ -15,19 +17,19 @@ export class UserService implements IUserService {
     this.userRepository = userRepository
   }
 
-  async lidaComCriacaoDoUsuario({ nome, role }: UserDTO) {
+  async lidaComCriacaoDoUsuario({ nome, role }: UserDTO): Promise<User | null> {
     try {
       if (!nome || typeof nome !== 'string') {
-        throw new ErroEncontradoNaCamadaDeServico('Nome é obrigatório e precisa ser uma string.')
+        throw new ReportarErrorAoSistema('Nome é obrigatório e precisa ser uma string.')
       }
-      if (!role || !['admin', 'discente', 'docente'].includes(role)) {
-        throw new ErroEncontradoNaCamadaDeServico('Uma role é obrigatória. Veja a documentação')
+      if (!role || !['ADMIN', 'DISCENTE', 'DOCENTE'].includes(role)) {
+        throw new ReportarErrorAoSistema('Uma role é obrigatória. Veja a documentação')
       }
 
       const user = await this.userRepository.criaUsuario({ nome, role })
       return user
     } catch (error) {
-      throw new Error('Error creating user')
+      throw error
     }
   }
 
@@ -39,15 +41,18 @@ export class UserService implements IUserService {
       }
       return user
     } catch (error) {
-      throw new Error('Error fetching user')
+      throw new Error('Erro ao buscar usuário')
     }
   }
   async lidaComAtualizacaoDoUsuario(id: number, data: Partial<UserDTO>) {
+    if (!data.nome || !data.role) {
+      throw new ReportarErrorAoSistema('Nome e role são obrigatórios')
+    }
     try {
       const updatedUser = await this.userRepository.atualizaUsuario(id, data)
       return updatedUser
     } catch (error) {
-      throw new Error('Error updating user')
+      throw new Error('Erro ao atualizar o usuário')
     }
   }
   
@@ -58,6 +63,18 @@ export class UserService implements IUserService {
       throw new Error('Error deleting user')
     }
   }
-}
 
-  
+  async lidaComBuscaDosUsuarios() {
+    try {
+      const users = await this.userRepository.buscaUsuarios()
+      
+      if (!users) {
+        return []
+      }
+      
+      return users
+    } catch (error) {
+      throw new Error('Error fetching user')
+    }
+  }
+}
