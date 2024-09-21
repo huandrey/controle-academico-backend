@@ -4,7 +4,7 @@ export interface ImportaDadosAlunoResponse {
   nome_do_curso: string
   turno_do_curso: string
   nome_do_campus: string
-  codigo_do_setor: string
+  codigo_do_setor: number
   nome_do_setor: string
   password: string
   historicoMatricula: HistoricoMatricula[]

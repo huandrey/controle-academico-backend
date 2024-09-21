@@ -28,10 +28,11 @@ export class SistemaController {
       const token = await this.sistemaService.buscaTokenDoUsuarioNaRPE(matricula, password, instituicao)
       const dadosAluno = await this.sistemaService.importaDadosDoAluno(matricula, password, token, instituicao)
       const user = await this.userService.lidaComCriacaoDoUsuario({ nome: dadosAluno.nome, role: 'ALUNO' })
+      await this.alunoService.lidaComCriacaoDoAluno({ ...dadosAluno, userId: user!.id })
 
       res.status(200).json({
         message: 'Autenticado com sucesso!',
-        data: { ...dadosAluno }
+        data: { ...dadosAluno, userId: user?.id }
       })
     } catch (error) {
       if (error instanceof ReportarErrorAoSistema) {

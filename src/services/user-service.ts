@@ -22,7 +22,7 @@ export class UserService implements IUserService {
       if (!nome || typeof nome !== 'string') {
         throw new ReportarErrorAoSistema('Nome é obrigatório e precisa ser uma string.')
       }
-      if (!role || !['ADMIN', 'DISCENTE', 'DOCENTE'].includes(role)) {
+      if (!role || !['ADMIN', 'ALUNO', 'DOCENTE'].includes(role)) {
         throw new ReportarErrorAoSistema('Uma role é obrigatória. Veja a documentação')
       }
 

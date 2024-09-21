@@ -37,7 +37,7 @@ model Aluno {
   nome_do_curso       String
   turno_do_curso      String
   nome_do_campus      String
-  codigo_do_setor     String
+  codigo_do_setor     Int
   nome_do_setor       String
   password            String
   userId              Int                        @unique
