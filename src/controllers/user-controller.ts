@@ -36,7 +36,6 @@ export class UserController {
   public async atualizaUsuario(req: AtualizaUsuarioRequest, res: Response): Promise<void> {
     try {
       const userId = parseInt(req.params.id, 10)
-      console.log(userId)
       const updates = req.body
 
       const updatedUser = await this.userService.lidaComAtualizacaoDoUsuario(userId, updates)

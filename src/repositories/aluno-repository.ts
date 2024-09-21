@@ -25,7 +25,7 @@ export class AlunoRepository implements IAlunoRepository {
     this.orm = orm
   }
 
-  async criaAluno(data: Aluno): Promise<Aluno> {
+  async criaAluno(data: AlunoDTO): Promise<Aluno> {
     return this.orm.criaAluno(data)
   }
 

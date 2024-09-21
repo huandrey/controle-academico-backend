@@ -56,21 +56,21 @@ export class PrismaDatabase implements IDatabase {
     throw new Error('Method not implemented.')
   }
   criaAluno(data: AlunoDTO): Promise<Aluno> {
-    console.log(data)
     const aluno = prisma.aluno.create({ 
       data: {
         nome: data.nome,
         matricula: data.matricula,
+        codigo_do_setor: data.codigo_do_setor,
+        nome_do_campus: data.nome_do_campus,
+        nome_do_curso: data.nome_do_curso,
+        nome_do_setor: data.nome_do_setor,
+        turno_do_curso: data.turno_do_curso,
         user: {
           connect: {
             id: data.userId,
           }
         },
-        curso: {
-          connect: {
-            id: data.cursoId,
-          }
-        }
+        password: data.password,
       },
     })
 

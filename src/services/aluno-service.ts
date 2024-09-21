@@ -18,18 +18,17 @@ export class AlunoService implements IAlunoService {
   }
 
   async lidaComCriacaoDoAluno(data: AlunoDTO) {
-    if (!data.nome || !data.matricula || !data.cursoId || !data.userId) {
+    if (!data.nome || !data.matricula || !data.userId) {
       throw new ReportarErrorAoSistema('Dados insuficientes para criar o usuário.')
     }
 
     try {
-      data.cursoId = Number(data.cursoId)
       data.userId = Number(data.userId)
       
       const aluno = await this.alunoRepository.criaAluno(data)
       return aluno
     } catch (error) {
-      console.log(error)
+      console.error(error)
       throw new Error('Error creating aluno')
     }
   }
@@ -67,7 +66,7 @@ export class AlunoService implements IAlunoService {
       throw new ReportarErrorAoSistema('ID do usuário não informado.')
     }
 
-    if (!data.nome || !data.matricula || !data.cursoId || !data.userId) {
+    if (!data.nome || !data.matricula || !data.userId) {
       throw new ReportarErrorAoSistema('Dados insuficientes para atualizar o usuário.')
     }
 
