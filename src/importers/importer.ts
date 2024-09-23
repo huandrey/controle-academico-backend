@@ -1,7 +1,11 @@
 import { Disciplina } from "@prisma/client"
+import { AutenticaUsuarioResponse } from "./api/autentica_usuario_response"
+import { ImportaDadosAlunoResponse } from "./api/importa_dados_aluno_response"
 
 export interface Importer {
-  autenticaUsuario(matricula: string, senha: string): Promise<string[]>
-  importaDisciplinas(discenteId: number, matricula: string, senha: string): Promise<Disciplina[]>
-  reportProgress(msg: string): void
+  buscaTokenDoUsuarioNaRPE(matricula: string, senha: string): Promise<string>
+  importaDadosDoAluno(matricula: string, senha: string, token: string): Promise<ImportaDadosAlunoResponse>
+  // autenticaUsuario(matricula: string, senha: string): Promise<AutenticaUsuarioResponse>
+  // importaDisciplinas(discenteId: number, matricula: string, senha: string)
+  // reportProgress(msg: string): void
 }

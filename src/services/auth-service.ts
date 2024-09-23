@@ -37,7 +37,6 @@ export class AuthService implements IAuthService {
   public async lidaComGeracaoDoTokenDoDiscente(usuario: { id: number }): Promise<string> {
     const payload = {
       id: usuario.id,
-      role: Role.DISCENTE,
     };
 
     const token = jwt.sign(payload, this.segredo, {

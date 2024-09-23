@@ -21,8 +21,6 @@ export class AutorizacaoMiddleware {
   constructor(alunoService?: AlunoService) {
     this.segredo = process.env.JWT_SECRET || 'segredo_padrao'
     this.alunoService = alunoService
-
-    console.log(alunoService)
   }
 
   public autorizarApenas(roleNecessaria: string) {
