@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,8 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { ReportarErrorAoSistema } from '../exceptions/ReportarErroAoSistema';
-export class UserService {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UserService = void 0;
+const ReportarErroAoSistema_1 = require("../exceptions/ReportarErroAoSistema");
+class UserService {
     constructor(userRepository) {
         this.userRepository = userRepository;
     }
@@ -16,10 +19,10 @@ export class UserService {
         return __awaiter(this, arguments, void 0, function* ({ nome, role }) {
             try {
                 if (!nome || typeof nome !== 'string') {
-                    throw new ReportarErrorAoSistema('Nome é obrigatório e precisa ser uma string.');
+                    throw new ReportarErroAoSistema_1.ReportarErrorAoSistema('Nome é obrigatório e precisa ser uma string.');
                 }
                 if (!role || !['ADMIN', 'ALUNO', 'DOCENTE'].includes(role)) {
-                    throw new ReportarErrorAoSistema('Uma role é obrigatória. Veja a documentação');
+                    throw new ReportarErroAoSistema_1.ReportarErrorAoSistema('Uma role é obrigatória. Veja a documentação');
                 }
                 const user = yield this.userRepository.criaUsuario({ nome, role });
                 return user;
@@ -46,7 +49,7 @@ export class UserService {
     lidaComAtualizacaoDoUsuario(id, data) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!data.nome || !data.role) {
-                throw new ReportarErrorAoSistema('Nome e role são obrigatórios');
+                throw new ReportarErroAoSistema_1.ReportarErrorAoSistema('Nome e role são obrigatórios');
             }
             try {
                 const updatedUser = yield this.userRepository.atualizaUsuario(id, data);
@@ -82,3 +85,4 @@ export class UserService {
         });
     }
 }
+exports.UserService = UserService;

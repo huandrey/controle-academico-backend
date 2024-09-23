@@ -1,4 +1,3 @@
-// src/database/PrismaDatabase.tsimport { PrismaClient } from'@prisma/client'
 import { Aluno, Disciplina, PrismaClient, User } from '@prisma/client'
 import { UserDTO } from '../dtos/user-dto'
 import { IDatabase } from'./database-interface'
@@ -49,8 +48,14 @@ export class PrismaDatabase implements IDatabase {
   buscaAlunoPorId(id: number): Promise<Aluno | null> {
     throw new Error('Method not implemented.')
   }
-  buscaAlunoPorMatricula(matricula: string): Promise<Aluno> {
-    throw new Error('Method not implemented.')
+  buscaAlunoPorMatricula(matricula: string): Promise<Aluno | null> {
+    const aluno = prisma.aluno.findUnique({
+      where: {
+        matricula,
+      },
+    })
+
+    return aluno
   }
   buscaAlunoPorEmail(email: string): Promise<Aluno> {
     throw new Error('Method not implemented.')

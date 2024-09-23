@@ -1,4 +1,3 @@
-import { Role } from "@prisma/client";
 import { ReportarErrorAoSistema } from "../exceptions/ReportarErroAoSistema";
 import { IAuthRepository } from "../repositories/auth-repository"
 import jwt from 'jsonwebtoken'

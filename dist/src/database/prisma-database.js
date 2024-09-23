@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,11 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-// src/database/PrismaDatabase.tsimport { PrismaClient } from'@prisma/client'
-import { PrismaClient } from '@prisma/client';
-import { PrismaClientInitializationError } from '@prisma/client/runtime/library';
-const prisma = new PrismaClient();
-export class PrismaDatabase {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PrismaDatabase = void 0;
+const client_1 = require("@prisma/client");
+const library_1 = require("@prisma/client/runtime/library");
+const prisma = new client_1.PrismaClient();
+class PrismaDatabase {
     salvaDisciplinas(data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -19,7 +21,7 @@ export class PrismaDatabase {
                 return disciplinas.count;
             }
             catch (error) {
-                if (error instanceof PrismaClientInitializationError) {
+                if (error instanceof library_1.PrismaClientInitializationError) {
                     console.error('Erro ao inicializar o Prisma Client:', error.message);
                 }
                 else {
@@ -59,7 +61,12 @@ export class PrismaDatabase {
         throw new Error('Method not implemented.');
     }
     buscaAlunoPorMatricula(matricula) {
-        throw new Error('Method not implemented.');
+        const aluno = prisma.aluno.findUnique({
+            where: {
+                matricula,
+            },
+        });
+        return aluno;
     }
     buscaAlunoPorEmail(email) {
         throw new Error('Method not implemented.');
@@ -118,3 +125,4 @@ export class PrismaDatabase {
         });
     }
 }
+exports.PrismaDatabase = PrismaDatabase;

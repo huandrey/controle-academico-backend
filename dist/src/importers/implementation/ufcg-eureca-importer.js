@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,8 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import axios from 'axios';
-export class EurecaImporter {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EurecaImporter = void 0;
+const axios_1 = __importDefault(require("axios"));
+class EurecaImporter {
     constructor() {
         this.URL_PARA_OBTER_TOKEN_DE_ACESSO = "https://eureca.sti.ufcg.edu.br/as/tokens";
         this.URL_BASE_EURECA = 'https://eureca.sti.ufcg.edu.br/das/v2';
@@ -26,7 +32,7 @@ export class EurecaImporter {
             }
             this.reportProgress('Buscando token do usuário na RPE...');
             try {
-                const response = yield axios.post(this.URL_PARA_OBTER_TOKEN_DE_ACESSO, {
+                const response = yield axios_1.default.post(this.URL_PARA_OBTER_TOKEN_DE_ACESSO, {
                     credentials: {
                         username,
                         password,
@@ -48,11 +54,11 @@ export class EurecaImporter {
         return __awaiter(this, void 0, void 0, function* () {
             this.reportProgress('Importando dados do aluno...');
             try {
-                const response = yield axios.get(`${this.URL_BASE_EURECA + this.URL_DADOS_ALUNO}?estudante=${matricula}`, {
+                const response = yield axios_1.default.get(`${this.URL_BASE_EURECA + this.URL_DADOS_ALUNO}?estudante=${matricula}`, {
                     headers: {
                         'accept': 'application/json',
                         'Connection': 'keep-alive',
-                        'token-de-autenticacao': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjAxMTA1NzMiLCJjb2RlIjoiMTQxMDIxMDAiLCJpc3MiOiIiLCJuYW1lIjoiSFVBTkRSRVkgREUgU09VWkEgUE9OVEVTIiwiZXhwIjoiMTcyNjk1ODcwMTY5MyIsInR5cGUiOiJBbHVubyIsImVtYWlsIjoiaHVhbmRyZXkucG9udGVzQGNjYy51ZmNnLmVkdS5iciJ9.bJJ2SoVbckSR2hU3WK0cS1qCZEMhadkV0v3iIpB7BHB577rVIoK-qHykR0dRRIFLKQGZTkTVumoHnDrwztlPNYiXGHiA0UxyZbopfdjl5KCpdfZZU3etWpqHjsaKuNf-i7AH2Dhi3A6ISToSpAf9cdd7nwsY7NSA6UoqK7b8OuSUg9uDVceto9X4RAy3PkLocL3c3UA5ljbi5nehAxwHmX-f9x1YePP5TqsWQNAbvNStXHlhg0VeY_N7pJVIhDaH5ntOjBCmb4Sy7qMYDQgruu7wSqK09TyNZPukDHH7yTh7tX225dYXHKed2KAhwA4x6WJbD2H9dxwJNUBkq2KK8g=='
+                        'token-de-autenticacao': token
                     }
                 });
                 const { nome, codigo_do_curso, nome_do_curso, turno_do_curso, codigo_do_curriculo, campus, nome_do_campus, codigo_do_setor, nome_do_setor, estado_civil, endereco, genero, data_de_nascimento, cpf, cep, telefone, situacao, forma_de_ingresso, periodo_de_ingresso, email, nacionalidade, local_de_nascimento, naturalidade, cor, creditos_do_cra, notas_acumuladas, periodos_completados, creditos_tentados, creditos_completados, creditos_isentos, creditos_falhados, creditos_suspensos, creditos_em_andamento, velocidade_media, taxa_de_sucesso, historico_de_matriculas } = response.data;
@@ -77,7 +83,7 @@ export class EurecaImporter {
                     nome_do_campus,
                     codigo_do_setor,
                     nome_do_setor,
-                    password: senha,
+                    password: '',
                     historicoMatricula: [...historico]
                 };
                 return aluno;
@@ -89,6 +95,7 @@ export class EurecaImporter {
         });
     }
 }
+exports.EurecaImporter = EurecaImporter;
 EurecaImporter.ERRO = "Matrícula inválida ou senha incorreta.";
 EurecaImporter.ERRO_NA_OBTENCAO_DO_TOKEN = "Matrícula inválida ou senha incorreta.";
 EurecaImporter.ERRO_NA_OBTENCAO_DO_TOKEN_DADOS_VAZIO = "Retorno da API vazio.";

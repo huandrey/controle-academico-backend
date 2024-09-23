@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,8 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { ReportarErrorAoSistema } from "../exceptions/ReportarErroAoSistema";
-export class SistemaController {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SistemaController = void 0;
+const ReportarErroAoSistema_1 = require("../exceptions/ReportarErroAoSistema");
+class SistemaController {
     constructor(userService, alunoService, disciplinaService, sistemaService) {
         this.userService = userService,
             this.alunoService = alunoService;
@@ -26,11 +29,11 @@ export class SistemaController {
                 yield this.alunoService.lidaComCriacaoDoAluno(Object.assign(Object.assign({}, dadosAluno), { userId: user.id }));
                 res.status(200).json({
                     message: 'Autenticado com sucesso!',
-                    data: Object.assign(Object.assign({}, dadosAluno), { userId: user === null || user === void 0 ? void 0 : user.id })
+                    data: Object.assign({}, dadosAluno)
                 });
             }
             catch (error) {
-                if (error instanceof ReportarErrorAoSistema) {
+                if (error instanceof ReportarErroAoSistema_1.ReportarErrorAoSistema) {
                     res.status(400).json({ error: error.message });
                 }
                 else {
@@ -40,3 +43,4 @@ export class SistemaController {
         });
     }
 }
+exports.SistemaController = SistemaController;

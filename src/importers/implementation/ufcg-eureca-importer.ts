@@ -54,7 +54,7 @@ export class EurecaImporter implements Importer {
         headers: {
           'accept': 'application/json',
           'Connection': 'keep-alive',
-          'token-de-autenticacao': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjAxMTA1NzMiLCJjb2RlIjoiMTQxMDIxMDAiLCJpc3MiOiIiLCJuYW1lIjoiSFVBTkRSRVkgREUgU09VWkEgUE9OVEVTIiwiZXhwIjoiMTcyNjk1ODcwMTY5MyIsInR5cGUiOiJBbHVubyIsImVtYWlsIjoiaHVhbmRyZXkucG9udGVzQGNjYy51ZmNnLmVkdS5iciJ9.bJJ2SoVbckSR2hU3WK0cS1qCZEMhadkV0v3iIpB7BHB577rVIoK-qHykR0dRRIFLKQGZTkTVumoHnDrwztlPNYiXGHiA0UxyZbopfdjl5KCpdfZZU3etWpqHjsaKuNf-i7AH2Dhi3A6ISToSpAf9cdd7nwsY7NSA6UoqK7b8OuSUg9uDVceto9X4RAy3PkLocL3c3UA5ljbi5nehAxwHmX-f9x1YePP5TqsWQNAbvNStXHlhg0VeY_N7pJVIhDaH5ntOjBCmb4Sy7qMYDQgruu7wSqK09TyNZPukDHH7yTh7tX225dYXHKed2KAhwA4x6WJbD2H9dxwJNUBkq2KK8g=='
+          'token-de-autenticacao': token
         }
       })
 
@@ -92,7 +92,7 @@ export class EurecaImporter implements Importer {
       nome_do_campus,
       codigo_do_setor,
       nome_do_setor,
-      password: senha,
+      password: '',
       historicoMatricula: [...historico]
     }
 

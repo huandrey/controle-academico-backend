@@ -64,7 +64,7 @@ describe('AlunoService', () => {
         password: 'senhaSegura123'
       };
 
-      await expect(alunoService.lidaComCriacaoDoAluno(dadosInvalidos)).to.be.equal(ReportarErrorAoSistema, 'Dados insuficientes para criar o usuário.');
+      await expect(alunoService.lidaComCriacaoDoAluno(dadosInvalidos)).to.be.Throw(ReportarErrorAoSistema, 'Dados insuficientes para criar o usuário.');
     });
   });
 
@@ -94,13 +94,13 @@ describe('AlunoService', () => {
     });
 
     it('deve lançar um erro se o ID não for informado', async () => {
-      await expect(alunoService.lidaComBuscaDoAlunoPorId(0)).to.be.equal(ReportarErrorAoSistema, 'ID do usuário não informado.');
+      await expect(alunoService.lidaComBuscaDoAlunoPorId(0)).to.be.Throw(ReportarErrorAoSistema, 'ID do usuário não informado.');
     });
 
     it('deve lançar um erro se o aluno não for encontrado', async () => {
       alunoRepositoryStub.buscaAlunoPorId.resolves(null);
 
-      await expect(alunoService.lidaComBuscaDoAlunoPorId(1)).to.be.equal(Error, 'User not found');
+      await expect(alunoService.lidaComBuscaDoAlunoPorId(1)).to.be.Throw(Error, 'User not found');
     });
   });
 
@@ -130,7 +130,7 @@ describe('AlunoService', () => {
     });
 
     it('deve lançar um erro se a matrícula não for informada', async () => {
-      await expect(alunoService.lidaComBuscaDoAlunoPorMatricula('')).to.be.equal(ReportarErrorAoSistema, 'Matricula do usuário não informada.');
+      await expect(alunoService.lidaComBuscaDoAlunoPorMatricula('')).to.be.Throw(ReportarErrorAoSistema, 'Matricula do usuário não informada.');
     });
   });
 
@@ -144,7 +144,7 @@ describe('AlunoService', () => {
     });
 
     it('deve lançar um erro se o ID não for informado', async () => {
-      await expect(alunoService.lidaComRemocaoDoAluno(0)).to.be.equal(ReportarErrorAoSistema, 'ID do usuário não informado.');
+      await expect(alunoService.lidaComRemocaoDoAluno(0)).to.be.Throw(ReportarErrorAoSistema, 'ID do usuário não informado.');
     });
   });
 });

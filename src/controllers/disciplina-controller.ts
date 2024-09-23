@@ -24,8 +24,3 @@ export class DisciplinaController {
 
   public async importaDisciplinas(req: Request, res: Response): Promise<void> {}
 }
-
-//   toString() {
-//     return 'UserController'
-//   }
-// }

@@ -4,11 +4,10 @@ import { UserDTO } from "../dtos/user-dto"
 
 export interface IUserRepository {
   criaUsuario(data: UserDTO): Promise<User>
+  buscaUsuarios(): Promise<User[] | null>
+  buscaUsuarioPorId(id: number): Promise<User | null> 
   atualizaUsuario(id: number, data: Partial<UserDTO>): Promise<User | null>
   deletaUsuario(id: number): Promise<void>
-  buscaUsuarioPorId(id: number): Promise<User | null>
-  buscaUsuarioPorEmail(email: string): Promise<User | null>
-  buscaUsuarios(): Promise<User[] | null>
 }
 
 export type UpdateUserDTO = {
@@ -25,9 +24,6 @@ export class UserRepository implements IUserRepository {
     this.orm = orm
   }
   buscaUsuarioPorId(id: number): Promise<User | null> {
-    throw new Error("Method not implemented.")
-  }
-  buscaUsuarioPorEmail(email: string): Promise<User | null> {
     throw new Error("Method not implemented.")
   }
   async criaUsuario(data: UserDTO): Promise<User> {

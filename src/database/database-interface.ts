@@ -14,7 +14,7 @@ export interface IDatabase {
   atualizaAluno(id: number, data: Partial<AlunoDTO>): Promise<Aluno>
   deletaAluno(id: number): Promise<void>
   buscaAlunoPorId(id: number): Promise<Aluno | null>
-  buscaAlunoPorMatricula(matricula: string): Promise<Aluno>
+  buscaAlunoPorMatricula(matricula: string): Promise<Aluno | null>
   buscaAlunoPorEmail(email: string): Promise<Aluno>
 
   autenticaUsuario(email: string, senha: string): Promise<User | null>

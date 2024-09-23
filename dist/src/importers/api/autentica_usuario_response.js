@@ -1,9 +1,13 @@
-export class AutenticaUsuarioResponse {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AutenticaUsuarioResponse = void 0;
+class AutenticaUsuarioResponse {
     constructor(token, usuario) {
         this.token = token;
         this.usuario = usuario;
     }
 }
+exports.AutenticaUsuarioResponse = AutenticaUsuarioResponse;
 class Usuario {
     constructor(id, nome, matricula, email, vinculo) {
         this.id = id;

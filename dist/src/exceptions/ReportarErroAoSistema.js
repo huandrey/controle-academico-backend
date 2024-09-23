@@ -1,4 +1,7 @@
-export class ReportarErrorAoSistema extends Error {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ReportarErrorAoSistema = void 0;
+class ReportarErrorAoSistema extends Error {
     constructor(message, maisInformacoesSobreOErro) {
         super(message);
         this.name = 'ReportarErrorAoSistema';
@@ -7,3 +10,4 @@ export class ReportarErrorAoSistema extends Error {
         }
     }
 }
+exports.ReportarErrorAoSistema = ReportarErrorAoSistema;

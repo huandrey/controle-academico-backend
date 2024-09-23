@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,9 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import jwt from 'jsonwebtoken';
-import { ReportarErrorAoSistema } from "../exceptions/ReportarErroAoSistema";
-export class AutorizacaoMiddleware {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AutorizacaoMiddleware = void 0;
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const ReportarErroAoSistema_1 = require("../exceptions/ReportarErroAoSistema");
+class AutorizacaoMiddleware {
     constructor(alunoService) {
         this.segredo = process.env.JWT_SECRET || 'segredo_padrao';
         this.alunoService = alunoService;
@@ -22,7 +28,7 @@ export class AutorizacaoMiddleware {
             }
             const token = cabecalhoAutenticacao.split(' ')[1];
             try {
-                const decodificado = jwt.verify(token, this.segredo);
+                const decodificado = jsonwebtoken_1.default.verify(token, this.segredo);
                 if (decodificado.role !== roleNecessaria) {
                     return res.status(403).json({ mensagem: 'Acesso negado. Permissão insuficiente.' });
                 }
@@ -47,7 +53,7 @@ export class AutorizacaoMiddleware {
         return __awaiter(this, void 0, void 0, function* () {
             const { matricula } = req.body;
             if (!this.alunoService) {
-                throw new ReportarErrorAoSistema("AlunoService is undefined. Por favor, verifique se a propriedade foi inicializada corretamente.");
+                throw new ReportarErroAoSistema_1.ReportarErrorAoSistema("AlunoService is undefined. Por favor, verifique se a propriedade foi inicializada corretamente.");
             }
             try {
                 const aluno = yield this.alunoService.lidaComBuscaDoAlunoPorMatricula(matricula);
@@ -60,7 +66,7 @@ export class AutorizacaoMiddleware {
                 next();
             }
             catch (error) {
-                if (error instanceof ReportarErrorAoSistema) {
+                if (error instanceof ReportarErroAoSistema_1.ReportarErrorAoSistema) {
                     res.status(400).json({ error: error.message });
                 }
                 else {
@@ -71,3 +77,4 @@ export class AutorizacaoMiddleware {
         });
     }
 }
+exports.AutorizacaoMiddleware = AutorizacaoMiddleware;

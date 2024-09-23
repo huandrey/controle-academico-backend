@@ -24,6 +24,12 @@ export class AlunoService implements IAlunoService {
 
     try {
       data.userId = Number(data.userId)
+
+      const userAlreadyExists = await this.alunoRepository.buscaAlunoPorMatricula(data.matricula)
+
+      if (userAlreadyExists) {
+        throw new ReportarErrorAoSistema('Matrícula já cadastrada.')
+      }
       
       const aluno = await this.alunoRepository.criaAluno(data)
       return aluno

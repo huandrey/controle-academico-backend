@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
-import { PayloadUserAlreadyExists } from "../middlewares/autorizacao-middleware";
 import { UserService } from "../services/user-service";
 import { AlunoService } from "../services/aluno-service";
 import { DisciplinaService } from "../services/disciplina-service";
-import { SessionDTO } from "../dtos/session-dto";
 import { SistemaService } from "../services/sistema-service";
 import { ReportarErrorAoSistema } from "../exceptions/ReportarErroAoSistema";
 
@@ -32,7 +30,7 @@ export class SistemaController {
 
       res.status(200).json({
         message: 'Autenticado com sucesso!',
-        data: { ...dadosAluno, userId: user?.id }
+        data: { ...dadosAluno }
       })
     } catch (error) {
       if (error instanceof ReportarErrorAoSistema) {

@@ -1,4 +1,7 @@
-export class DisciplinaRepository {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DisciplinaRepository = void 0;
+class DisciplinaRepository {
     constructor(orm) {
         this.orm = orm;
     }
@@ -6,3 +9,4 @@ export class DisciplinaRepository {
         return this.orm.salvaDisciplinas(disciplinas);
     }
 }
+exports.DisciplinaRepository = DisciplinaRepository;

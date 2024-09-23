@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,9 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { ReportarErrorAoSistema } from "../exceptions/ReportarErroAoSistema";
-import jwt from 'jsonwebtoken';
-export class AuthService {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AuthService = void 0;
+const ReportarErroAoSistema_1 = require("../exceptions/ReportarErroAoSistema");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+class AuthService {
     constructor(authRepository) {
         this.authRepository = authRepository;
         this.segredo = process.env.JWT_SECRET || 'segredo_padrao';
@@ -20,7 +26,7 @@ export class AuthService {
                 id: usuario.id,
                 role: usuario.role,
             };
-            const token = jwt.sign(payload, this.segredo, {
+            const token = jsonwebtoken_1.default.sign(payload, this.segredo, {
                 expiresIn: '1h',
             });
             try {
@@ -28,7 +34,7 @@ export class AuthService {
                 return token;
             }
             catch (err) {
-                throw new ReportarErrorAoSistema("Erro ao tentar salvar token no banco de dados");
+                throw new ReportarErroAoSistema_1.ReportarErrorAoSistema("Erro ao tentar salvar token no banco de dados");
             }
         });
     }
@@ -37,7 +43,7 @@ export class AuthService {
             const payload = {
                 id: usuario.id,
             };
-            const token = jwt.sign(payload, this.segredo, {
+            const token = jsonwebtoken_1.default.sign(payload, this.segredo, {
                 expiresIn: '1h',
             });
             try {
@@ -45,8 +51,9 @@ export class AuthService {
                 return token;
             }
             catch (err) {
-                throw new ReportarErrorAoSistema("Erro ao tentar salvar token no banco de dados", err);
+                throw new ReportarErroAoSistema_1.ReportarErrorAoSistema("Erro ao tentar salvar token no banco de dados", err);
             }
         });
     }
 }
+exports.AuthService = AuthService;

@@ -1,23 +1,27 @@
-import { Router } from 'express';
-import { PrismaDatabase } from '../database/prisma-database';
-import { SistemaController } from '../controllers/sistema-controller';
-import { AlunoService } from '../services/aluno-service';
-import { AlunoRepository } from '../repositories/aluno-repository';
-import { DisciplinaRepository } from '../repositories/disciplina-repository';
-import { UserRepository } from '../repositories/user-repository';
-import { DisciplinaService } from '../services/disciplina-service';
-import { UserService } from '../services/user-service';
-import { SistemaService } from '../services/sistema-service';
-const router = Router();
-const database = new PrismaDatabase();
-const discenteRepository = new AlunoRepository(database);
-const disciplinaRepository = new DisciplinaRepository(database);
-const userRepository = new UserRepository(database);
-const userService = new UserService(userRepository);
-const discenteService = new AlunoService(discenteRepository);
-const disciplinaService = new DisciplinaService(disciplinaRepository);
-const sistemaService = new SistemaService();
-const sistemaController = new SistemaController(userService, discenteService, disciplinaService, sistemaService);
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sistemaRoutes = void 0;
+const express_1 = require("express");
+const prisma_database_1 = require("../database/prisma-database");
+const sistema_controller_1 = require("../controllers/sistema-controller");
+const aluno_service_1 = require("../services/aluno-service");
+const aluno_repository_1 = require("../repositories/aluno-repository");
+const disciplina_repository_1 = require("../repositories/disciplina-repository");
+const user_repository_1 = require("../repositories/user-repository");
+const disciplina_service_1 = require("../services/disciplina-service");
+const user_service_1 = require("../services/user-service");
+const sistema_service_1 = require("../services/sistema-service");
+const router = (0, express_1.Router)();
+exports.sistemaRoutes = router;
+const database = new prisma_database_1.PrismaDatabase();
+const discenteRepository = new aluno_repository_1.AlunoRepository(database);
+const disciplinaRepository = new disciplina_repository_1.DisciplinaRepository(database);
+const userRepository = new user_repository_1.UserRepository(database);
+const userService = new user_service_1.UserService(userRepository);
+const discenteService = new aluno_service_1.AlunoService(discenteRepository);
+const disciplinaService = new disciplina_service_1.DisciplinaService(disciplinaRepository);
+const sistemaService = new sistema_service_1.SistemaService();
+const sistemaController = new sistema_controller_1.SistemaController(userService, discenteService, disciplinaService, sistemaService);
 // Onde eu encaixo o eureca aqui? Middleware? Helpers handles? 
 /*
 Cliente inicia sessão -> servidor recebe ->
@@ -28,4 +32,3 @@ Cliente inicia sessão -> servidor recebe ->
                     retorna para o cliente
 */
 router.post('/session', sistemaController.autenticaAluno.bind(sistemaController));
-export { router as sistemaRoutes };

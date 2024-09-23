@@ -1,3 +1,4 @@
+"use strict";
 //   constructor(private userService: IUserService) {}
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -8,7 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-export class DisciplinaController {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DisciplinaController = void 0;
+class DisciplinaController {
     constructor(disciplinaService) {
         this.disciplinaService = disciplinaService;
     }
@@ -29,7 +32,4 @@ export class DisciplinaController {
         return __awaiter(this, void 0, void 0, function* () { });
     }
 }
-//   toString() {
-//     return 'UserController'
-//   }
-// }
+exports.DisciplinaController = DisciplinaController;

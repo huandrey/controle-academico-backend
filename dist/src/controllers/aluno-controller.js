@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,8 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { ReportarErrorAoSistema } from '../exceptions/ReportarErroAoSistema';
-export class AlunoController {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AlunoController = void 0;
+const ReportarErroAoSistema_1 = require("../exceptions/ReportarErroAoSistema");
+class AlunoController {
     constructor(AlunoService) {
         this.AlunoService = AlunoService;
     }
@@ -20,7 +23,7 @@ export class AlunoController {
                 res.status(201).json({ message: "Aluno criado com sucesso!" });
             }
             catch (error) {
-                if (error instanceof ReportarErrorAoSistema) {
+                if (error instanceof ReportarErroAoSistema_1.ReportarErrorAoSistema) {
                     res.status(400).json({ error: error.message });
                 }
                 else {
@@ -43,7 +46,7 @@ export class AlunoController {
                 }
             }
             catch (error) {
-                if (error instanceof ReportarErrorAoSistema) {
+                if (error instanceof ReportarErroAoSistema_1.ReportarErrorAoSistema) {
                     res.status(400).json({ error: error.message });
                 }
                 else {
@@ -66,7 +69,7 @@ export class AlunoController {
                 }
             }
             catch (error) {
-                if (error instanceof ReportarErrorAoSistema) {
+                if (error instanceof ReportarErroAoSistema_1.ReportarErrorAoSistema) {
                     res.status(400).json({ error: error.message });
                 }
                 else {
@@ -90,7 +93,7 @@ export class AlunoController {
                 }
             }
             catch (error) {
-                if (error instanceof ReportarErrorAoSistema) {
+                if (error instanceof ReportarErroAoSistema_1.ReportarErrorAoSistema) {
                     res.status(400).json({ error: error.message });
                 }
                 else {
@@ -108,7 +111,7 @@ export class AlunoController {
                 res.status(204).send();
             }
             catch (error) {
-                if (error instanceof ReportarErrorAoSistema) {
+                if (error instanceof ReportarErroAoSistema_1.ReportarErrorAoSistema) {
                     res.status(400).json({ error: error.message });
                 }
                 else {
@@ -119,3 +122,4 @@ export class AlunoController {
         });
     }
 }
+exports.AlunoController = AlunoController;
