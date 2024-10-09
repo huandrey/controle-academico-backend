@@ -27,7 +27,7 @@ export class AutenticacaoService implements IAutenticacaoService {
     });
 
     try {
-      await this.autenticacaoRepository.adicionaTokenDeAutenticacao(usuario.id, token)
+      // await this.autenticacaoRepository.adicionaTokenDeAutenticacao(usuario.id, token)
       return token;
     } catch (err) {
       throw new ReportarErrorAoSistema("Erro ao tentar salvar token no banco de dados")

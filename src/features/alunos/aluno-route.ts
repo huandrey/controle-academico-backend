@@ -17,6 +17,7 @@ const usuarioService = new UsuarioService(usuarioRepository)
 const alunoController = new AlunoController(usuarioService, alunoService)
 const middlewareAutorizacao = new AutorizacaoMiddleware()
 
+router.get('/:id', middlewareAutorizacao.autorizarApenas('ADMIN'), alunoController.buscaAlunoPorId.bind(alunoController))
 router.post('/create', middlewareAutorizacao.autorizarApenas('ADMIN'), alunoController.criaAluno.bind(alunoController))
 router.post('/update', middlewareAutorizacao.autorizarApenas('ADMIN'), alunoController.atualizaAluno.bind(alunoController))
 router.delete('/delete', middlewareAutorizacao.autorizarApenas('ADMIN'), alunoController.deletaAluno.bind(alunoController));

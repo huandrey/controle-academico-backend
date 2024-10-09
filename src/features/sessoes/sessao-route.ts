@@ -29,6 +29,6 @@ const sessaoController = new SessaoController(
   sessaoService,
 )
 
-router.post('/session', sessaoController.criaConexaoComSessao.bind(sessaoController))
+router.post('/iniciar-sessao', sessaoController.criaConexaoComSessao.bind(sessaoController))
 
 export { router as sessaoRoutes }

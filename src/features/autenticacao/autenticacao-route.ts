@@ -11,6 +11,6 @@ const autenticacaoRepository = new AutenticacaoRepository(database)
 const autenticacaoService = new AutenticacaoService(autenticacaoRepository)
 const autenticacaoController = new AutenticacaoController(autenticacaoService)
 
-router.post('/token/generate', autenticacaoController.gerarToken.bind(autenticacaoController))
+router.post('/gera-token', autenticacaoController.gerarToken.bind(autenticacaoController))
 
 export { router as autenticacaoRoutes }

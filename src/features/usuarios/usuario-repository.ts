@@ -5,7 +5,7 @@ import { UsuarioDTO } from "./usuario-dto"
 export interface IUsuarioRepository {
   criaUsuario(usuarioDTO: UsuarioDTO): Promise<number>
   atualizaUsuario(id: number, data: Partial<UsuarioDTO>): Promise<Usuario | null>
-  deletaUsuario(id: number): Promise<void>
+  removeUsuario(id: number): Promise<void>
   buscaUsuarioPorId(id: number): Promise<Usuario | null>
   buscaPorTodosUsuarios(): Promise<Usuario[] | null>
 }
@@ -34,7 +34,7 @@ export class UsuarioRepository implements IUsuarioRepository {
     return this.orm.buscaPorTodosUsuarios()
   }
 
-  async deletaUsuario(id: number): Promise<void> {
+  async removeUsuario(id: number): Promise<void> {
     await this.orm.removeUsuario(id)
   }
 }

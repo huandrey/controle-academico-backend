@@ -21,8 +21,8 @@ export class UsuarioController {
   public async criaUsuario(req: CriaUsuarioRequest, res: Response): Promise<void> {
     try {
       const { nome, role } = req.body
-      const usuario = await this.usuarioService.lidaComCriacaoDoUsuario({ nome, role })
-      res.status(201).json(usuario)
+      const usuarioId = await this.usuarioService.lidaComCriacaoDoUsuario({ nome, role })
+      res.status(201).json({ message: `Usuário com id ${usuarioId} criado com sucesso` })
     } catch (error) {
       if (error instanceof ReportarErrorAoSistema) {
         res.status(400).json({ error: error.message })
@@ -43,14 +43,14 @@ export class UsuarioController {
       if (updatedUsuario) {
         res.status(200).json(updatedUsuario)
       } else {
-        res.status(404).json({ error: 'Usuario not found' })
+        res.status(404).json({ message: 'Usuario not found' })
       }
     } catch (error) {
       if (error instanceof ReportarErrorAoSistema) {
-        res.status(400).json({ error: error.message })
+        res.status(400).json({ message: error.message })
       } else {
         console.error(error)
-        res.status(500).json({ error: 'Internal Server Error' })
+        res.status(500).json({ message: 'Internal Server Error' })
       }
     }
   }
@@ -62,10 +62,10 @@ export class UsuarioController {
       res.status(204).send() // No Content
     } catch (error) {
       if (error instanceof ReportarErrorAoSistema) {
-        res.status(400).json({ error: error.message })
+        res.status(400).json({ message: error.message })
       } else {
         console.error(error)
-        res.status(500).json({ error: 'Internal Server Error' })
+        res.status(500).json({ message: 'Internal Server Error' })
       }
     }
   }
@@ -85,10 +85,10 @@ export class UsuarioController {
       res.status(200).json(usuarioEncontrado)
     } catch (error) {
       if (error instanceof ReportarErrorAoSistema) {
-        res.status(400).json({ error: error.message })
+        res.status(400).json({ message: error.message })
       } else {
         console.error(error)
-        res.status(500).json({ error: 'Internal Server Error' })
+        res.status(500).json({ message: 'Internal Server Error' })
       }
     }
   }
@@ -103,10 +103,10 @@ export class UsuarioController {
       })
     } catch (error) {
       if (error instanceof ReportarErrorAoSistema) {
-        res.status(400).json({ error: error.message })
+        res.status(400).json({ message: error.message })
       } else {
         console.error(error)
-        res.status(500).json({ error: 'Internal Server Error' })
+        res.status(500).json({ message: 'Internal Server Error' })
       }
     }
   }

@@ -44,9 +44,10 @@ export class UsuarioService implements IUsuarioService {
     }
   }
   async lidaComAtualizacaoDoUsuario(id: number, data: Partial<UsuarioDTO>) {
-    if (!data.nome || !data.role) {
-      throw new ReportarErrorAoSistema('Nome e role são obrigatórios')
+    if (!data.nome) {
+      throw new ReportarErrorAoSistema('Não foi informado nenhum parâmetro. Veja a documentação.')
     }
+
     try {
       const updatedUsuario = await this.usuarioRepository.atualizaUsuario(id, data)
       return updatedUsuario
@@ -56,11 +57,7 @@ export class UsuarioService implements IUsuarioService {
   }
 
   async lidaComRemocaoDoUsuario(id: number) {
-    try {
-      await this.usuarioRepository.deletaUsuario(id)
-    } catch (error) {
-      throw new Error('Error deleting usuario')
-    }
+    await this.usuarioRepository.removeUsuario(id)
   }
 
   async lidaComBuscaDeTodosUsuariosDoSistema() {

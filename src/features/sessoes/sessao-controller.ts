@@ -16,13 +16,13 @@ export class SessaoController {
 
   constructor(usuarioService: UsuarioService, alunoService: AlunoService, disciplinaService: DisciplinaService, sessaoService: SessaoService) {
     this.usuarioService = usuarioService,
-    this.alunoService = alunoService
+      this.alunoService = alunoService
     this.disciplinaService = disciplinaService
     this.sessaoService = sessaoService
   }
 
   public async criaConexaoComSessao(req: Request, res: Response): Promise<void> {
-    const sessaoDTO: SessaoDTO = req.body;
+    const sessaoDTO: Omit<SessaoDTO, 'alunoId'> = req.body;
 
     try {
       const aluno = await this.configuraSessaoDoUsuario(sessaoDTO)
@@ -37,11 +37,11 @@ export class SessaoController {
     }
   }
 
-  private async configuraSessaoDoUsuario(sessaoDTO: SessaoDTO) {
-    const { matricula, senha, vinculo, alunoId } = sessaoDTO
+  private async configuraSessaoDoUsuario(sessaoDTO: Omit<SessaoDTO, 'alunoId'>) {
+    const { matricula, senha, vinculo } = sessaoDTO
 
     const importer: Importer = this.sessaoService.lidaComIdentificacaoDaInstituicaoDeEnsino(vinculo)
-    await importer.autenticaAluno(matricula, senha) // Autentica usuário e salva cookie retornado da response 
+    await importer.autenticaAluno(matricula, senha) // Autentica usuário e salva cookie retornado da response
 
     const dadosAluno = {
       nome: 'Huandrey',
