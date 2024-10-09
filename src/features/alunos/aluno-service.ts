@@ -40,9 +40,19 @@ export class AlunoService implements IAlunoService {
     }
     try {
       const aluno = await this.alunoRepository.buscaAlunoPorId(id)
-      if (!aluno) {
-        throw new Error('User not found')
-      }
+      return aluno
+    } catch (error) {
+      throw new Error('Error fetching aluno')
+    }
+  }
+  
+  async lidaComBuscaDeInformacoesDoAlunoPorId(id: number) {
+    if (!id) {
+      throw new ReportarErrorAoSistema('ID do usuário não informado.')
+    }
+
+    try {
+      const aluno = await this.alunoRepository.buscaInformacoesDoAlunoPorId(id)
       return aluno
     } catch (error) {
       throw new Error('Error fetching aluno')
@@ -55,7 +65,6 @@ export class AlunoService implements IAlunoService {
     }
     try {
       const aluno = await this.alunoRepository.buscaAlunoPorMatricula(matricula)
-
       return aluno
     } catch (error) {
       throw new Error('Error fetching aluno')

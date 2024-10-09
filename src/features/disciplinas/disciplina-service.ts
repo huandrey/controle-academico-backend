@@ -24,10 +24,7 @@ export class DisciplinaService implements IDisciplinaService {
 
 
     const disciplinasImportadas = await importer.obterDisciplinasDoHistoricoAcademico(alunoId!)
-    const disciplinasImportadasDetalhadas = await importer.obterDetalhesDaDisciplina()
-
-    console.log(`importUserData: ${JSON.stringify(disciplinasImportadas, null, 2)}`)
-
+    await importer.obterDetalhesDaDisciplina()
     const countDisciplinasCriadas = await this.disciplinaRepository.saveDisciplinas(disciplinasImportadas)
 
     return countDisciplinasCriadas

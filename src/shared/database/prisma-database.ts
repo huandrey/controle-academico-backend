@@ -7,40 +7,22 @@ import { PrismaClientInitializationError } from '@prisma/client/runtime/library'
 import { DisciplinaHistoricoProps } from '../importers/implementation/ufcg-importer'
 
 const prisma = new PrismaClient()
-
 export class PrismaDatabase implements IDatabase {
-
   // Métodos de consulta e escrita do banco de dados para Usuário
-  async salvaUsuario(data: UsuarioDTO): Promise<Usuario> {
-    return prisma.usuario.create({
-      data: {
-        nome: data.nome,
-        role: data.role,
-      }
-    })
+  async salvaUsuario(usuarioDTO: UsuarioDTO): Promise<Usuario> {
+    return await prisma.usuario.create({ data: { ...usuarioDTO } })
   }
 
   async atualizaUsuario(id: number, data: Partial<UsuarioDTO>): Promise<Usuario> {
-    return prisma.usuario.update({ where: { id }, data })
+    return await prisma.usuario.update({ where: { id }, data })
   }
 
   async adicionaTokenDeAutenticacaoAoUsuario(id: number, token: string): Promise<void> {
-    await prisma.usuario.update({
-      where: {
-        id,
-      },
-      data: {
-        token
-      }
-    })
+    await prisma.usuario.update({ where: { id }, data: { token } })
   }
 
   async buscaUsuarioPorId(id: number): Promise<Usuario | null> {
-    return prisma.usuario.findUnique({ where: { id } })
-  }
-
-  buscaUsuarioPorEmail(email: string): Promise<Usuario | null> {
-    throw new Error('Method not implemented.')
+    return await prisma.usuario.findUnique({ where: { id } })
   }
 
   async buscaPorTodosUsuarios(): Promise<Usuario[] | null> {
@@ -52,8 +34,8 @@ export class PrismaDatabase implements IDatabase {
   }
 
   // Métodos de consulta e escrita do banco de dados para Aluno
-  salvaAluno(data: AlunoDTO): Promise<Aluno> {
-    const aluno = prisma.aluno.create({
+  async salvaAluno(data: AlunoDTO): Promise<Aluno> {
+    const aluno = await prisma.aluno.create({
       data: {
         nome: data.nome,
         matricula: data.matricula,
@@ -68,24 +50,39 @@ export class PrismaDatabase implements IDatabase {
     return aluno
   }
 
-  atualizaAluno(id: number, data: Partial<AlunoDTO>): Promise<Aluno> {
-    throw new Error('Method not implemented.')
+  async atualizaAluno(id: number, data: Partial<AlunoDTO>): Promise<Aluno> {
+    return await prisma.aluno.update({ where: { id }, data })
   }
 
-  buscaAlunoPorId(id: number): Promise<Aluno | null> {
-    throw new Error('Method not implemented.')
+  async buscaAlunoPorId(id: number): Promise<Aluno | null> {
+    return await prisma.aluno.findUnique({ where: { id } })
   }
 
-  buscaAlunoPorEmail(email: string): Promise<Aluno> {
-    throw new Error('Method not implemented.')
+  async buscaInformacoesDoAlunoPorId(id: number): Promise<Omit<Aluno, 'usuarioId'> | null> {
+    return await prisma.aluno.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        nome: true,
+        matricula: true,
+        universidade: true,
+        curso: true,
+        historicoAcademico: true,
+        createdAt: true,
+        updatedAt: true,
+      }
+    })
   }
 
-  buscaAlunoPorMatricula(matricula: string): Promise<Aluno> {
-    throw new Error('Method not implemented.')
+
+  async buscaAlunoPorMatricula(matricula: string): Promise<Aluno | null> {
+    return await prisma.aluno.findUnique({ where: { matricula } })
   }
 
-  removeAluno(id: number): Promise<void> {
-    throw new Error('Method not implemented.')
+  async removeAluno(id: number) {
+    await prisma.aluno.delete({ where: { id } })
   }
 
   // Métodos de consulta e escrita do banco de dados para Disciplina

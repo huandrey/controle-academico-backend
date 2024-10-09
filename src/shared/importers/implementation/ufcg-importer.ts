@@ -50,17 +50,7 @@ export class UFCGImporter implements Importer {
   private ERRO_AUTENTICACAO = "ERRO NA AUTENTICAÇÃO"
   public static readonly ERRO = "Matrícula inválida ou senha incorreta."
 
-  reportProgress(message: string): void {
-    console.log(message) // Implement your progress reporting logic here
-  }
-
-  private cleanText = (text: string): string => {
-    return he.decode(text) // Decodifica entidades HTML
-      .replace(/\s+/g, ' ')
-      .trim() // Remove espaços em branco no início e no final
-  }
-
-  public async autenticaAluno(matricula: string, senha: string): Promise<cheerio.CheerioAPI | undefined> {
+  public async autenticaAluno(matricula: string, senha: string): Promise<void> {
     this.reportProgress("Tentando fazer login...")
 
     try {
@@ -68,20 +58,22 @@ export class UFCGImporter implements Importer {
         [this.LOGIN]: matricula,
         [this.SENHA]: senha,
         [this.COMMAND]: this.ALUNO_LOGIN
-      }), urlSearchParams)
+      }), {
+        timeout: 10000,
+        withCredentials: true,
+        validateStatus: () => true,
+        httpsAgent: new (require('https').Agent)({
+          rejectUnauthorized: false
+        }),
+        responseEncoding: 'binary',
+      })
 
       this.cookies = response.headers['set-cookie']!
-      let html = iconv.decode(Buffer.from(response.data), 'ISO-8859-1')
-      html = html.replace(/<meta[^>]*charset=["']?[^"'>]+["']?[^>]*>/i, '<meta charset="UTF-8">')
-
-      const loadedDocument = cheerio.load(html)
+      const loadedDocument = this.carregaHtml(response)
 
       if (loadedDocument('head').text().includes(this.ERRO_AUTENTICACAO) || loadedDocument('body').text().includes(UFCGImporter.ERRO)) {
         throw new Error("Authentication Failed")
       }
-
-      console.log(loadedDocument)
-      return loadedDocument
     } catch (err) {
       console.error(err)
     }
@@ -101,9 +93,12 @@ export class UFCGImporter implements Importer {
         responseEncoding: 'binary',
       })
 
-      const loadedHistoricoDocument = this.carregaHtml(historicoResponse)
-      const trsDisciplinas = loadedHistoricoDocument("div[id=disciplinas] > table > tbody > tr").toArray()
 
+
+      const loadedHistoricoDocument = this.carregaHtml(historicoResponse)
+
+   
+      const trsDisciplinas = loadedHistoricoDocument("div[id=disciplinas] > table > tbody > tr").toArray()
       for (const el of trsDisciplinas) {
         const tds = loadedHistoricoDocument(el).find("td")
         const disciplina: DisciplinaHistoricoProps = this.montaDisciplina(tds, alunoId)
@@ -197,7 +192,7 @@ export class UFCGImporter implements Importer {
       semestre: tds.eq(7).text() || '',
       mediaFinal: isNaN(parseFloat(tds.eq(5).text().replace(",", "."))) ? null : parseFloat(tds.eq(5).text().replace(",", ".")),
       situacao: this.definirSituacaoDisciplina(tds.eq(6).text(), parseFloat(tds.eq(5).text().replace(",", "."))),
-      docente: 'Ausente',
+      docente: this.cleanText(tds.eq(1).find('span.small').text() || 'Ausente')
     }
 
     return disciplina
@@ -208,6 +203,8 @@ export class UFCGImporter implements Importer {
 
     switch (situacao) {
       case this.APROVADO:
+        status = SituacaoDisciplina.APROVADO;
+        break;
       case this.DISPENSA:
         status = SituacaoDisciplina.DISPENSA;
         if (mediaFinal === null) {
@@ -266,5 +263,15 @@ export class UFCGImporter implements Importer {
       default:
         return 3
     }
+  }
+
+  reportProgress(message: string): void {
+    console.log(message) // Implement your progress reporting logic here
+  }
+
+  private cleanText = (text: string): string => {
+    return he.decode(text) // Decodifica entidades HTML
+      .replace(/\s+/g, ' ')
+      .trim() // Remove espaços em branco no início e no final
   }
 }

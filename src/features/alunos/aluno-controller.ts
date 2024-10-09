@@ -17,6 +17,12 @@ export class AlunoController {
     const aluno: AlunoDTO = req.body
 
     try {
+      const alunoJaExiste = await this.alunoService.lidaComBuscaDoAlunoPorMatricula(aluno.matricula)
+      if (alunoJaExiste) {
+        res.status(400).json({ error: 'Aluno já cadastrado' })
+        return
+      }
+
       const usuarioId = await this.usuarioService.lidaComCriacaoDoUsuario(aluno)
       await this.alunoService.lidaComCriacaoDoAluno({ ...aluno, usuarioId })
       res.status(201).json({ message: "Aluno criado com sucesso!" })

@@ -7,8 +7,8 @@ export interface IAlunoRepository {
   atualizaAluno(id: number, data: Partial<AlunoDTO>): Promise<Aluno | null>
   removeAluno(id: number): Promise<void>
   buscaAlunoPorId(id: number): Promise<Aluno | null>
-  buscaAlunoPorEmail(email: string): Promise<Aluno | null>
   buscaAlunoPorMatricula(matricula: string): Promise<Aluno | null>
+  buscaInformacoesDoAlunoPorId(id: number): Promise<Omit<Aluno, 'usuarioId'> | null>
 }
 
 export type AtualizaAlunoDTO = {
@@ -45,7 +45,7 @@ export class AlunoRepository implements IAlunoRepository {
     return this.orm.buscaAlunoPorMatricula(matricula)
   }
 
-  async buscaAlunoPorEmail(email: string): Promise<Aluno | null> {
-    return this.orm.buscaAlunoPorEmail(email)
+  async buscaInformacoesDoAlunoPorId(id: number): Promise<Omit<Aluno, 'usuarioId'> | null> {
+    return this.orm.buscaInformacoesDoAlunoPorId(id)
   }
 }

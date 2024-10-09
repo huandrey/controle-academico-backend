@@ -46,7 +46,8 @@ model Aluno {
   usuarioId          Int          @unique
   nome               String
   matricula          String       @unique @db.VarChar(9)
-  curso              String       @default("Universidade Federal de Campina Grande")
+  curso              String       @default("Ciência da Computação")
+  universidade       String       @default("Universidade Federal de Campina Grande")
   usuario            Usuario      @relation(fields: [usuarioId], references: [id])
   historicoAcademico Disciplina[]
   createdAt          DateTime     @default(now())

@@ -7,7 +7,6 @@ export interface IUsuarioRepository {
   atualizaUsuario(id: number, data: Partial<UsuarioDTO>): Promise<Usuario | null>
   deletaUsuario(id: number): Promise<void>
   buscaUsuarioPorId(id: number): Promise<Usuario | null>
-  buscaUsuarioPorEmail(email: string): Promise<Usuario | null>
   buscaPorTodosUsuarios(): Promise<Usuario[] | null>
 }
 
@@ -29,10 +28,6 @@ export class UsuarioRepository implements IUsuarioRepository {
 
   buscaUsuarioPorId(id: number): Promise<Usuario | null> {
     return this.orm.buscaUsuarioPorId(id)
-  }
-
-  buscaUsuarioPorEmail(email: string): Promise<Usuario | null> {
-    return this.orm.buscaUsuarioPorEmail(email)
   }
 
   async buscaPorTodosUsuarios(): Promise<Usuario[] | null> {
